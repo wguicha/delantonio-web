@@ -1,5 +1,5 @@
 import { apiClient } from './api';
-import type { Order, OrderFormData, ApiResponse, PaginatedResponse } from '../types';
+import type { Order, OrderFormData, ApiResponse, PaginatedResponse, Customer } from '../types';
 import type { CartItem } from '../types';
 
 export interface CreateOrderPayload {
@@ -17,10 +17,17 @@ export interface CreateOrderPayload {
   }>;
   acceptTerms: boolean;
   acceptPrivacy: boolean;
+  latitude?: number;
+  longitude?: number;
+}
+
+export interface GeoCoords {
+  lat: number;
+  lng: number;
 }
 
 export const orderService = {
-  createOrder: async (formData: OrderFormData, cartItems: CartItem[]): Promise<Order> => {
+  createOrder: async (formData: OrderFormData, cartItems: CartItem[], geo?: GeoCoords): Promise<Order> => {
     const payload: CreateOrderPayload = {
       customer: {
         name: formData.name,
@@ -36,6 +43,7 @@ export const orderService = {
       })),
       acceptTerms: formData.acceptTerms,
       acceptPrivacy: formData.acceptPrivacy,
+      ...(geo && { latitude: geo.lat, longitude: geo.lng }),
     };
     const response = await apiClient.post<ApiResponse<Order>>('/orders', payload);
     return response.data.data;
@@ -58,5 +66,10 @@ export const orderService = {
   updateStatus: async (orderId: string, status: string): Promise<Order> => {
     const response = await apiClient.patch<ApiResponse<Order>>(`/orders/${orderId}/status`, { status });
     return response.data.data;
+  },
+
+  getCustomers: async (page = 1, limit = 50): Promise<PaginatedResponse<Customer>> => {
+    const response = await apiClient.get<PaginatedResponse<Customer>>(`/customers?page=${page}&limit=${limit}`);
+    return response.data;
   },
 };
