@@ -46,10 +46,10 @@ export function MenuItemCard({ item, categorySlug }: MenuItemCardProps) {
       {/* Red accent line on hover */}
       <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-rock-red scale-y-0 group-hover:scale-y-100 transition-transform duration-200 origin-top" aria-hidden="true" />
 
-      <div className="p-4 flex flex-col flex-1">
+      <div className="p-5 flex flex-col flex-1">
         {/* Name */}
         <h3
-          className="text-rock-white mb-1 leading-tight"
+          className="text-rock-white mb-2 leading-tight"
           style={{
             fontFamily: "'Bebas Neue', Impact, sans-serif",
             fontSize: '1.25rem',

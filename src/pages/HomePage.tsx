@@ -74,7 +74,7 @@ export function HomePage() {
             <div className="h-px w-16 bg-gradient-to-l from-transparent to-rock-red" />
           </div>
 
-          <p className="text-rock-metal max-w-lg mx-auto mb-10 text-sm sm:text-base leading-relaxed">
+          <p className="text-rock-metal max-w-lg mx-auto mb-10 text-sm sm:text-base leading-relaxed text-center">
             Pizzas artesanas con actitud. Metallica, Iron Maiden, AC/DC...
             Cada pizza lleva el alma de una leyenda del rock.
           </p>

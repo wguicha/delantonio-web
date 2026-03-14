@@ -84,7 +84,7 @@ export function MenuSection({ categories, loading }: MenuSectionProps) {
 
         {/* Items grid */}
         <div
-          className="grid gap-4"
+          className="grid gap-6"
           style={{
             gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))',
           }}
