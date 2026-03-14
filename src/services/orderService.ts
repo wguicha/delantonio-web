@@ -1,0 +1,62 @@
+import { apiClient } from './api';
+import type { Order, OrderFormData, ApiResponse, PaginatedResponse } from '../types';
+import type { CartItem } from '../types';
+
+export interface CreateOrderPayload {
+  customer: {
+    name: string;
+    phone: string;
+  };
+  pickupTime: string;
+  notes?: string;
+  items: Array<{
+    menuItemId: string;
+    quantity: number;
+    size?: 'half' | 'full';
+    notes?: string;
+  }>;
+  acceptTerms: boolean;
+  acceptPrivacy: boolean;
+}
+
+export const orderService = {
+  createOrder: async (formData: OrderFormData, cartItems: CartItem[]): Promise<Order> => {
+    const payload: CreateOrderPayload = {
+      customer: {
+        name: formData.name,
+        phone: formData.phone,
+      },
+      pickupTime: formData.pickupTime,
+      notes: formData.notes,
+      items: cartItems.map((item) => ({
+        menuItemId: item.menuItem.id,
+        quantity: item.quantity,
+        size: item.size,
+        notes: item.notes,
+      })),
+      acceptTerms: formData.acceptTerms,
+      acceptPrivacy: formData.acceptPrivacy,
+    };
+    const response = await apiClient.post<ApiResponse<Order>>('/orders', payload);
+    return response.data.data;
+  },
+
+  lookupPhone: async (phone: string): Promise<{ name: string } | null> => {
+    try {
+      const response = await apiClient.get<ApiResponse<{ name: string }>>(`/customers/lookup?phone=${phone}`);
+      return response.data.data;
+    } catch {
+      return null;
+    }
+  },
+
+  getOrders: async (page = 1, limit = 20): Promise<PaginatedResponse<Order>> => {
+    const response = await apiClient.get<PaginatedResponse<Order>>(`/orders?page=${page}&limit=${limit}`);
+    return response.data;
+  },
+
+  updateStatus: async (orderId: string, status: string): Promise<Order> => {
+    const response = await apiClient.patch<ApiResponse<Order>>(`/orders/${orderId}/status`, { status });
+    return response.data.data;
+  },
+};

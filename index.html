@@ -1,10 +1,69 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>delantonio-web</title>
+
+    <!-- SEO Meta Tags -->
+    <title>Del Antonio - Pizzería Rock | Pizzas artesanas en Málaga</title>
+    <meta name="description" content="Pizzería Del Antonio, el sabor del rock hecho pizza. Pizzas artesanas con nombres de bandas legendarias: Metallica, Iron Maiden, AC/DC. Pide tu pizza para recoger." />
+    <meta name="keywords" content="pizzería, pizza, málaga, del antonio, rock, artesana, para llevar, recoger" />
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="Pizzería Del Antonio" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="restaurant" />
+    <meta property="og:title" content="Del Antonio - Pizzería Rock" />
+    <meta property="og:description" content="El sabor del rock hecho pizza. Pizzas artesanas con nombres de bandas legendarias." />
+    <meta property="og:image" content="/og-image.jpg" />
+    <meta property="og:url" content="https://pizzeriadelantonio.es" />
+    <meta property="og:locale" content="es_ES" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Del Antonio - Pizzería Rock" />
+    <meta name="twitter:description" content="El sabor del rock hecho pizza." />
+    <meta name="twitter:image" content="/og-image.jpg" />
+
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Restaurant",
+      "name": "Pizzería Del Antonio",
+      "description": "Pizzería con temática rock. Pizzas artesanas con nombres de bandas legendarias.",
+      "servesCuisine": "Pizza",
+      "priceRange": "€€",
+      "url": "https://pizzeriadelantonio.es",
+      "telephone": "",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "",
+        "addressLocality": "Málaga",
+        "addressCountry": "ES"
+      },
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+          "opens": "13:00",
+          "closes": "23:00"
+        }
+      ],
+      "menu": "https://pizzeriadelantonio.es/#menu",
+      "hasMenu": {
+        "@type": "Menu",
+        "name": "Menú Del Antonio",
+        "url": "https://pizzeriadelantonio.es/#menu"
+      }
+    }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet" />
   </head>
   <body>
     <div id="root"></div>
