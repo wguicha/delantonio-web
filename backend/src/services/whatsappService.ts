@@ -70,4 +70,14 @@ export const whatsappService = {
 
     await sendWhatsAppMessage({ to: phone, message });
   },
+
+  notifyOrderReady: async (phone: string, customerName: string, pickupTime: string): Promise<void> => {
+    const message = `✅ *¡Tu pedido está listo, ${customerName}!*\n\n` +
+      `🍕 *Pizzería Del Antonio*\n\n` +
+      `Tu pedido ya está preparado y listo para recoger.\n` +
+      `🕐 Hora de recogida: *${pickupTime}*\n\n` +
+      `¡Te esperamos! 🤘`;
+
+    await sendWhatsAppMessage({ to: phone, message });
+  },
 };

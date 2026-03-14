@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { orderService } from '../services/orderService';
 import { menuService } from '../services/menuService';
+import { API_BASE_URL } from '../services/api';
 import { Logo } from '../components/layout/Logo';
 import type { Order, OrderStatus, Category, MenuItem, Customer } from '../types';
 
@@ -65,6 +66,8 @@ export function AdminPage() {
   const [orderFilter, setOrderFilter] = useState<OrderFilter>('active');
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
   const [secsSinceRefresh, setSecsSinceRefresh] = useState(0);
+  const [sseConnected, setSseConnected] = useState(false);
+  const esRef = useRef<EventSource | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -104,30 +107,71 @@ export function AdminPage() {
     }
   }, []);
 
-  // Polling + seconds counter when on orders tab
+  // SSE connection for real-time orders, with polling fallback
   useEffect(() => {
     if (activeTab !== 'orders') {
+      esRef.current?.close();
       if (pollRef.current) clearInterval(pollRef.current);
       if (tickRef.current) clearInterval(tickRef.current);
       return;
     }
-    fetchOrders();
-    pollRef.current = setInterval(() => fetchOrders(true), 30000);
-    tickRef.current = setInterval(() => {
-      setSecsSinceRefresh((s) => s + 1);
-    }, 1000);
+
+    const token = useAuthStore.getState().token;
+    const sseUrl = `${API_BASE_URL}/orders/events?token=${encodeURIComponent(token ?? '')}`;
+
+    setOrdersLoading(true);
+    setSseConnected(false);
+
+    const es = new EventSource(sseUrl);
+    esRef.current = es;
+
+    es.onmessage = (e: MessageEvent) => {
+      const data = JSON.parse(e.data as string) as
+        | { type: 'initial'; orders: Order[] }
+        | { type: 'update'; order: Order };
+
+      if (data.type === 'initial') {
+        setOrders(data.orders);
+        setOrdersLoading(false);
+        setSecsSinceRefresh(0);
+        setSseConnected(true);
+      } else if (data.type === 'update') {
+        setOrders((prev) => {
+          const idx = prev.findIndex((o) => o.id === data.order.id);
+          if (idx >= 0) {
+            const updated = [...prev];
+            updated[idx] = data.order;
+            return updated;
+          }
+          return [data.order, ...prev];
+        });
+        setSecsSinceRefresh(0);
+      }
+    };
+
+    es.onerror = () => {
+      es.close();
+      setSseConnected(false);
+      // Fallback: poll every 30s
+      fetchOrders();
+      pollRef.current = setInterval(() => fetchOrders(true), 30000);
+    };
+
+    tickRef.current = setInterval(() => setSecsSinceRefresh((s) => s + 1), 1000);
+
     return () => {
+      es.close();
       if (pollRef.current) clearInterval(pollRef.current);
       if (tickRef.current) clearInterval(tickRef.current);
     };
   }, [activeTab, fetchOrders]);
 
-  // ── Fetch menu (once)
+  // ── Fetch menu (once) — uses admin endpoint that returns ALL items including inactive
   useEffect(() => {
     if (activeTab !== 'menu' || categories.length > 0) return;
     setMenuLoading(true);
     menuService
-      .getCategories()
+      .getAdminCategories()
       .then(setCategories)
       .finally(() => setMenuLoading(false));
   }, [activeTab, categories.length]);
@@ -308,17 +352,20 @@ export function AdminPage() {
               <div className="flex items-center gap-2 text-xs text-rock-metal">
                 <span
                   className={`w-2 h-2 rounded-full transition-colors ${
-                    secsSinceRefresh < 5 ? 'bg-green-500 animate-pulse' : 'bg-rock-border'
+                    sseConnected ? 'bg-green-500 animate-pulse' : secsSinceRefresh < 5 ? 'bg-yellow-500' : 'bg-rock-border'
                   }`}
+                  title={sseConnected ? 'Tiempo real (SSE)' : 'Polling (fallback)'}
                 />
-                <span>Hace {secsSinceRefresh}s</span>
-                <button
-                  onClick={() => fetchOrders()}
-                  className="text-rock-red hover:text-rock-red-bright transition-colors text-base leading-none"
-                  aria-label="Actualizar pedidos"
-                >
-                  ↻
-                </button>
+                <span>{sseConnected ? 'En vivo' : `Hace ${secsSinceRefresh}s`}</span>
+                {!sseConnected && (
+                  <button
+                    onClick={() => fetchOrders()}
+                    className="text-rock-red hover:text-rock-red-bright transition-colors text-base leading-none"
+                    aria-label="Actualizar pedidos"
+                  >
+                    ↻
+                  </button>
+                )}
               </div>
             </div>
 

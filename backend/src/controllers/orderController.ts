@@ -1,9 +1,14 @@
+import { EventEmitter } from 'events';
 import { Request, Response } from 'express';
 import { z } from 'zod';
 import { prisma } from '../config/database';
 import { whatsappService } from '../services/whatsappService';
 import { normalizeSpanishPhone, isValidSpanishPhone } from '../services/phoneValidationService';
 import { OrderStatus } from '@prisma/client';
+
+// Shared emitter for real-time SSE — one event per order change
+export const orderEmitter = new EventEmitter();
+orderEmitter.setMaxListeners(100);
 
 const createOrderSchema = z.object({
   customer: z.object({
@@ -178,6 +183,7 @@ export async function createOrder(req: Request, res: Response): Promise<void> {
     totalAmount
   ).catch(console.error);
 
+  orderEmitter.emit('order:change', order);
   res.status(201).json({ success: true, data: order });
 }
 
@@ -221,8 +227,57 @@ export async function updateOrderStatus(req: Request, res: Response): Promise<vo
       data: { status },
       include: { customer: true, items: { include: { menuItem: true } } },
     });
+
+    orderEmitter.emit('order:change', order);
+
+    // Notify customer via WhatsApp when order is ready to pick up
+    if (status === 'READY') {
+      const pickupFormatted = new Date(order.pickupTime).toLocaleTimeString('es-ES', {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+      whatsappService
+        .notifyOrderReady(order.customer.phone, order.customer.name, pickupFormatted)
+        .catch(console.error);
+    }
+
     res.json({ success: true, data: order });
   } catch {
     res.status(404).json({ success: false, message: 'Order not found' });
   }
+}
+
+export async function streamOrders(req: Request, res: Response): Promise<void> {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no');
+  res.flushHeaders();
+
+  // Send current active orders immediately on connect
+  try {
+    const orders = await prisma.order.findMany({
+      where: { status: { in: ['PENDING', 'PREPARING', 'READY'] } },
+      include: { customer: true, items: { include: { menuItem: true } } },
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+    });
+    res.write(`data: ${JSON.stringify({ type: 'initial', orders })}\n\n`);
+  } catch {
+    res.write(`data: ${JSON.stringify({ type: 'error', message: 'Failed to load orders' })}\n\n`);
+  }
+
+  // Push any subsequent order changes
+  const handler = (order: unknown) => {
+    res.write(`data: ${JSON.stringify({ type: 'update', order })}\n\n`);
+  };
+  orderEmitter.on('order:change', handler);
+
+  // Keep-alive ping every 25s to prevent proxy timeouts
+  const keepAlive = setInterval(() => res.write(': keepalive\n\n'), 25000);
+
+  req.on('close', () => {
+    clearInterval(keepAlive);
+    orderEmitter.off('order:change', handler);
+  });
 }

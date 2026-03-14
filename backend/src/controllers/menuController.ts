@@ -2,6 +2,16 @@ import { Request, Response } from 'express';
 import { z } from 'zod';
 import { prisma } from '../config/database';
 
+export async function getAdminCategories(_req: Request, res: Response): Promise<void> {
+  const categories = await prisma.category.findMany({
+    include: {
+      items: { orderBy: { sortOrder: 'asc' } },
+    },
+    orderBy: { sortOrder: 'asc' },
+  });
+  res.json({ success: true, data: categories });
+}
+
 export async function getCategories(req: Request, res: Response): Promise<void> {
   const categories = await prisma.category.findMany({
     where: { isActive: true },
