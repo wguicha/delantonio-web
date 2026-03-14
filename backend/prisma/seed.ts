@@ -6,8 +6,9 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Seeding database...');
 
-  // Create admin user
-  const hashedPassword = await bcrypt.hash('admin123', 12);
+  // Create admin user — password from ADMIN_PASSWORD env var, fallback 'admin123' for local dev
+  const adminPassword = process.env.ADMIN_PASSWORD ?? 'admin123';
+  const hashedPassword = await bcrypt.hash(adminPassword, 12);
   await prisma.admin.upsert({
     where: { username: 'admin' },
     update: {},
@@ -16,7 +17,7 @@ async function main() {
       password: hashedPassword,
     },
   });
-  console.log('Admin user created: admin / admin123');
+  console.log(`Admin user ready: admin / ${adminPassword === 'admin123' ? 'admin123 (default)' : '***'}`);
 
   // Create categories and items
   const categories = [
