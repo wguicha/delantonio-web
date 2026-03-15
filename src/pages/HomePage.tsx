@@ -255,17 +255,35 @@ export function HomePage() {
               <dl className="space-y-3">
                 <div className="flex justify-between items-center border-b border-rock-border pb-3">
                   <dt className="text-rock-metal-light text-sm" style={{ fontFamily: "'Roboto Condensed', sans-serif" }}>
-                    Martes – Domingo
+                    Domingos
                   </dt>
                   <dd className="text-rock-gold font-bold" style={{ fontFamily: "'Roboto Condensed', sans-serif" }}>
-                    13:00 – 23:00
+                    12:00 – 16:00
+                  </dd>
+                </div>
+                <div className="flex justify-between items-center border-b border-rock-border pb-3">
+                  <dt className="text-rock-metal-light text-sm" style={{ fontFamily: "'Roboto Condensed', sans-serif" }}>
+                    Domingos
+                  </dt>
+                  <dd className="text-rock-gold font-bold" style={{ fontFamily: "'Roboto Condensed', sans-serif" }}>
+                    20:00 – 00:00
+                  </dd>
+                </div>
+                <div className="flex justify-between items-center border-b border-rock-border pb-3">
+                  <dt className="text-rock-metal-light text-sm" style={{ fontFamily: "'Roboto Condensed', sans-serif" }}>
+                    Lunes – Sábados
+                  </dt>
+                  <dd className="text-rock-gold font-bold" style={{ fontFamily: "'Roboto Condensed', sans-serif" }}>
+                    12:00 – 16:00
                   </dd>
                 </div>
                 <div className="flex justify-between items-center">
-                  <dt className="text-rock-metal text-sm" style={{ fontFamily: "'Roboto Condensed', sans-serif" }}>
-                    Lunes
+                  <dt className="text-rock-metal-light text-sm" style={{ fontFamily: "'Roboto Condensed', sans-serif" }}>
+                    Lunes – Sábados
                   </dt>
-                  <dd className="text-rock-metal text-sm italic">Cerrado</dd>
+                  <dd className="text-rock-gold font-bold" style={{ fontFamily: "'Roboto Condensed', sans-serif" }}>
+                    20:00 – 02:00
+                  </dd>
                 </div>
               </dl>
               <p className="text-rock-metal text-xs mt-6 border-t border-rock-border pt-4">
@@ -288,7 +306,8 @@ export function HomePage() {
                 <p className="text-rock-white" style={{ fontFamily: "'Roboto Condensed', sans-serif" }}>
                   Pizzería Del Antonio
                 </p>
-                <p className="text-rock-metal-light text-sm">Málaga, España</p>
+                <p className="text-rock-metal-light text-sm">Pl. Autonomía, 25</p>
+                <p className="text-rock-metal-light text-sm">23730 Villanueva de la Reina, Jaén</p>
               </address>
               <div className="mt-6 border-t border-rock-border pt-4 space-y-2">
                 <p className="text-rock-metal-light text-sm">
