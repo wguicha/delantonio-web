@@ -82,7 +82,7 @@ export function Footer() {
           <p className="text-rock-metal text-xs">
             Sitio web realizado por{' '}
             <a
-              href="https://github.com/wguicha"
+              href="https://williamgdev.com/"
               target="_blank"
               rel="noopener noreferrer"
               className="text-rock-red hover:text-rock-red-bright transition-colors"
