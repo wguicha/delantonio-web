@@ -35,8 +35,8 @@ export function MenuItemCard({ item, categorySlug }: MenuItemCardProps) {
       {/* Rock band badge */}
       {isRockPizza && (
         <div
-          className="absolute top-0 right-0 bg-rock-red text-white text-xs px-2 py-0.5 z-10"
-          style={{ fontFamily: "'Bebas Neue', Impact, sans-serif", letterSpacing: '0.1em' }}
+          className="absolute top-0 right-0 bg-rock-red text-white text-xs px-2 py-1 z-10"
+          style={{ fontFamily: "'Bebas Neue', Impact, sans-serif", letterSpacing: '0.08em', fontSize: '0.7rem' }}
           aria-label="Especialidad rock"
         >
           🎸 ROCK
@@ -46,13 +46,13 @@ export function MenuItemCard({ item, categorySlug }: MenuItemCardProps) {
       {/* Red accent line on hover */}
       <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-rock-red scale-y-0 group-hover:scale-y-100 transition-transform duration-200 origin-top" aria-hidden="true" />
 
-      <div className="p-5 flex flex-col flex-1">
+      <div className="p-4 flex flex-col flex-1">
         {/* Name */}
         <h3
-          className="text-rock-white mb-2 leading-tight break-words"
+          className="text-rock-white mb-1.5 leading-tight break-words"
           style={{
             fontFamily: "'Bebas Neue', Impact, sans-serif",
-            fontSize: '1.25rem',
+            fontSize: '1.15rem',
             letterSpacing: '0.05em',
           }}
         >
@@ -61,12 +61,12 @@ export function MenuItemCard({ item, categorySlug }: MenuItemCardProps) {
 
         {/* Description/Ingredients */}
         {item.description && (
-          <p className="text-rock-metal-light text-xs mb-3 leading-relaxed flex-1 break-words">
+          <p className="text-rock-metal-light text-xs mb-2 leading-snug flex-1 break-words">
             {item.description}
           </p>
         )}
 
-        <div className="mt-auto">
+        <div className="mt-2">
           {/* Simple price */}
           {!hasHalfFull && item.price != null && (
             <div className="flex items-center justify-between gap-2">
@@ -110,7 +110,7 @@ export function MenuItemCard({ item, categorySlug }: MenuItemCardProps) {
 
           {/* Half / Full prices */}
           {hasHalfFull && (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1.5">
               {item.priceHalf != null && (
                 <div className="flex items-center justify-between gap-2">
                   <div>
