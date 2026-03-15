@@ -271,19 +271,25 @@ export function HomePage() {
                 </div>
                 <div className="flex justify-between items-center border-b border-rock-border pb-3">
                   <dt className="text-rock-metal-light text-sm" style={{ fontFamily: "'Roboto Condensed', sans-serif" }}>
-                    Lunes – Sábados
+                    Martes – Sábados
                   </dt>
                   <dd className="text-rock-gold font-bold" style={{ fontFamily: "'Roboto Condensed', sans-serif" }}>
                     12:00 – 16:00
                   </dd>
                 </div>
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center border-b border-rock-border pb-3">
                   <dt className="text-rock-metal-light text-sm" style={{ fontFamily: "'Roboto Condensed', sans-serif" }}>
-                    Lunes – Sábados
+                    Martes – Sábados
                   </dt>
                   <dd className="text-rock-gold font-bold" style={{ fontFamily: "'Roboto Condensed', sans-serif" }}>
                     20:00 – 02:00
                   </dd>
+                </div>
+                <div className="flex justify-between items-center">
+                  <dt className="text-rock-metal text-sm" style={{ fontFamily: "'Roboto Condensed', sans-serif" }}>
+                    Lunes
+                  </dt>
+                  <dd className="text-rock-metal text-sm italic">Cerrado (excepto festivos)</dd>
                 </div>
               </dl>
               <p className="text-rock-metal text-xs mt-6 border-t border-rock-border pt-4">
