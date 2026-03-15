@@ -29,7 +29,7 @@ export function MenuItemCard({ item, categorySlug }: MenuItemCardProps) {
 
   return (
     <article
-      className="relative flex flex-col bg-rock-card border border-rock-border hover:border-rock-red/50 transition-all duration-200 group overflow-hidden"
+      className="relative flex flex-col bg-rock-card border border-rock-border hover:border-rock-red/50 transition-all duration-200 group overflow-hidden min-w-0"
       aria-label={`${item.name}${item.description ? ` - ${item.description}` : ''}`}
     >
       {/* Rock band badge */}
@@ -49,7 +49,7 @@ export function MenuItemCard({ item, categorySlug }: MenuItemCardProps) {
       <div className="p-5 flex flex-col flex-1">
         {/* Name */}
         <h3
-          className="text-rock-white mb-2 leading-tight"
+          className="text-rock-white mb-2 leading-tight break-words"
           style={{
             fontFamily: "'Bebas Neue', Impact, sans-serif",
             fontSize: '1.25rem',
@@ -61,7 +61,7 @@ export function MenuItemCard({ item, categorySlug }: MenuItemCardProps) {
 
         {/* Description/Ingredients */}
         {item.description && (
-          <p className="text-rock-metal-light text-xs mb-3 leading-relaxed flex-1">
+          <p className="text-rock-metal-light text-xs mb-3 leading-relaxed flex-1 break-words">
             {item.description}
           </p>
         )}

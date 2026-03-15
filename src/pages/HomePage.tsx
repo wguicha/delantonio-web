@@ -38,21 +38,35 @@ export function HomePage() {
           </div>
 
           {/* Main title */}
-          <h1
-            className="mb-2 leading-none"
+          <div className="relative inline-block">
+            <img
+              src="/tongue.png"
+              alt=""
+              aria-hidden="true"
+              className="absolute object-contain drop-shadow-[0_0_16px_rgba(220,38,38,0.9)] rotate-12 z-10 pointer-events-none"
             style={{
-              fontFamily: "'Bebas Neue', Impact, sans-serif",
-              fontSize: 'clamp(5rem, 18vw, 12rem)',
-              letterSpacing: '0.04em',
-              color: '#f5f5f5',
-              textShadow: '0 0 80px rgba(220,38,38,0.25), 0 4px 30px rgba(0,0,0,0.8)',
+              width: 'clamp(5rem, 20vw, 13.5rem)',
+              height: 'clamp(5rem, 20vw, 13.5rem)',
+              top: 0,
+              right: 'clamp(2rem, 10vw, 7.5rem)',
             }}
-          >
-            DEL{' '}
-            <span style={{ color: '#dc2626', textShadow: '0 0 40px rgba(220,38,38,0.6)' }}>
-              ANTONIO
-            </span>
-          </h1>
+            />
+            <h1
+              className="mb-2 leading-none"
+              style={{
+                fontFamily: "'Metal Mania', 'Bebas Neue', Impact, sans-serif",
+                fontSize: 'clamp(5rem, 18vw, 12rem)',
+                letterSpacing: '0.04em',
+                color: '#f5f5f5',
+                textShadow: '0 0 80px rgba(220,38,38,0.25), 0 4px 30px rgba(0,0,0,0.8)',
+              }}
+            >
+              DEL{' '}
+              <span style={{ color: '#dc2626', textShadow: '0 0 40px rgba(220,38,38,0.6)' }}>
+                ANTONIO
+              </span>
+            </h1>
+          </div>
 
           {/* Subtitle */}
           <p
@@ -62,6 +76,8 @@ export function HomePage() {
               fontSize: 'clamp(0.85rem, 2.5vw, 1.25rem)',
               letterSpacing: '0.4em',
               textTransform: 'uppercase',
+              textAlign: 'center',
+              paddingLeft: '0.4em',
             }}
           >
             El sabor del rock hecho pizza
@@ -74,7 +90,10 @@ export function HomePage() {
             <div className="h-px w-16 bg-gradient-to-l from-transparent to-rock-red" />
           </div>
 
-          <p className="text-rock-metal max-w-lg mx-auto mb-10 text-sm sm:text-base leading-relaxed text-center">
+          <p
+            className="text-rock-metal text-sm sm:text-base leading-relaxed"
+            style={{ textAlign: 'center', maxWidth: '32rem', margin: '0 auto 2.5rem' }}
+          >
             Pizzas artesanas con actitud. Metallica, Iron Maiden, AC/DC...
             Cada pizza lleva el alma de una leyenda del rock.
           </p>
