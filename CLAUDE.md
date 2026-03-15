@@ -1,6 +1,6 @@
 # Del Antonio Web — Contexto del Proyecto
 
-Pizzería "Del Antonio" con temática rock. Málaga, España.
+Pizzería "Del Antonio" con temática rock. Villanueva de la Reina, Jaén, España.
 Stack: Vite + React + TS + Tailwind (frontend) / Node.js + Express + Prisma + PostgreSQL (backend).
 
 ## Estado: COMPLETO (7/7 fases)
@@ -113,8 +113,8 @@ backend/
   - `ADMIN_PASSWORD` en env vars de Render antes de correr el seed
 
 ## Pendiente antes de ir live
-- Añadir `/public/og-image.jpg` (imagen Open Graph para redes sociales)
-- Completar dirección real y teléfono en `index.html` (Schema.org)
-- Configurar WhatsApp Business API en Meta Developer Console
-- Cambiar `ADMIN_PASSWORD` en producción (default: admin123)
-- Coordenadas reales de la pizzería en `PIZZERIA_LAT` / `PIZZERIA_LNG`
+- [x] Completar dirección real y teléfono en `index.html` (Schema.org) — **DONE**
+- [x] Coordenadas reales de la pizzería en `PIZZERIA_LAT` / `PIZZERIA_LNG` — **DONE (38.7732, -3.6410)**
+- [ ] Añadir `/public/og-image.jpg` (imagen Open Graph para redes sociales)
+- [ ] Configurar WhatsApp Business API en Meta Developer Console
+- [ ] Cambiar `ADMIN_PASSWORD` en producción (default: admin123)
