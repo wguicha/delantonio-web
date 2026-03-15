@@ -83,6 +83,7 @@ export function AdminPage() {
     priceFull: string;
   } | null>(null);
   const [savingItemId, setSavingItemId] = useState<string | null>(null);
+  const [reorderingItemId, setReorderingItemId] = useState<string | null>(null);
 
   // ── Customers state
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -244,6 +245,47 @@ export function AdminPage() {
       setEditingItem(null);
     } finally {
       setSavingItemId(null);
+    }
+  };
+
+  // ── Reorder menu items
+  const moveItem = async (itemId: string, direction: 'up' | 'down') => {
+    const category = activeCategory;
+    if (!category) return;
+
+    const itemIndex = category.items.findIndex((i) => i.id === itemId);
+    if (itemIndex === -1) return;
+
+    const newIndex = direction === 'up' ? itemIndex - 1 : itemIndex + 1;
+    if (newIndex < 0 || newIndex >= category.items.length) return;
+
+    const item = category.items[itemIndex];
+    const targetItem = category.items[newIndex];
+    const tempSortOrder = item.sortOrder;
+
+    setReorderingItemId(itemId);
+    try {
+      // Swap sort orders
+      await Promise.all([
+        menuService.updateItemSortOrder(item.id, targetItem.sortOrder),
+        menuService.updateItemSortOrder(targetItem.id, tempSortOrder),
+      ]);
+
+      // Update local state
+      setCategories((prev) =>
+        prev.map((cat) => {
+          if (cat.id !== category.id) return cat;
+          const items = [...cat.items];
+          const idx = items.findIndex((i) => i.id === itemId);
+          if (idx === -1) return cat;
+          const newIdx = direction === 'up' ? idx - 1 : idx + 1;
+          if (newIdx < 0 || newIdx >= items.length) return cat;
+          [items[idx], items[newIdx]] = [items[newIdx], items[idx]];
+          return { ...cat, items };
+        })
+      );
+    } finally {
+      setReorderingItemId(null);
     }
   };
 
@@ -449,14 +491,18 @@ export function AdminPage() {
                       </span>
                     </div>
                     <ul className="divide-y divide-rock-border">
-                      {activeCategory.items.map((item) => (
+                      {activeCategory.items.map((item, index) => (
                         <MenuItemRow
                           key={item.id}
                           item={item}
+                          itemIndex={index}
+                          totalItems={activeCategory.items.length}
                           toggling={togglingItemId === item.id}
+                          reordering={reorderingItemId === item.id}
                           editing={editingItem?.id === item.id ? editingItem : null}
                           saving={savingItemId === item.id}
                           onToggle={() => toggleItem(item.id)}
+                          onMove={(direction) => moveItem(item.id, direction)}
                           onStartEdit={() =>
                             setEditingItem({
                               id: item.id,
@@ -672,10 +718,14 @@ function OrderCard({ order, updating, onUpdateStatus }: OrderCardProps) {
 
 interface MenuItemRowProps {
   item: MenuItem;
+  itemIndex: number;
+  totalItems: number;
   toggling: boolean;
+  reordering: boolean;
   editing: { id: string; price: string; priceHalf: string; priceFull: string } | null;
   saving: boolean;
   onToggle: () => void;
+  onMove: (direction: 'up' | 'down') => void;
   onStartEdit: () => void;
   onEditChange: (field: 'price' | 'priceHalf' | 'priceFull', val: string) => void;
   onSave: () => void;
@@ -684,16 +734,22 @@ interface MenuItemRowProps {
 
 function MenuItemRow({
   item,
+  itemIndex,
+  totalItems,
   toggling,
+  reordering,
   editing,
   saving,
   onToggle,
+  onMove,
   onStartEdit,
   onEditChange,
   onSave,
   onCancel,
 }: MenuItemRowProps) {
   const hasHalfFull = item.priceHalf != null || item.priceFull != null;
+  const canMoveUp = itemIndex > 0;
+  const canMoveDown = itemIndex < totalItems - 1;
 
   return (
     <li className={`px-4 py-3 transition-opacity ${!item.isActive ? 'opacity-40' : ''}`}>
@@ -705,7 +761,29 @@ function MenuItemRow({
           )}
         </div>
 
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Move buttons */}
+          <div className="flex gap-1">
+            <button
+              onClick={() => onMove('up')}
+              disabled={!canMoveUp || reordering}
+              className="text-rock-metal hover:text-rock-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-sm px-1.5 py-0.5"
+              title="Mover arriba"
+              aria-label={`Mover ${item.name} arriba`}
+            >
+              ↑
+            </button>
+            <button
+              onClick={() => onMove('down')}
+              disabled={!canMoveDown || reordering}
+              className="text-rock-metal hover:text-rock-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-sm px-1.5 py-0.5"
+              title="Mover abajo"
+              aria-label={`Mover ${item.name} abajo`}
+            >
+              ↓
+            </button>
+          </div>
+
           {/* Price (click to edit) */}
           {!editing && (
             <button

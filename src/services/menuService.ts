@@ -29,4 +29,9 @@ export const menuService = {
     const response = await apiClient.get<ApiResponse<Category[]>>('/menu/admin/categories');
     return response.data.data;
   },
+
+  updateItemSortOrder: async (id: string, sortOrder: number): Promise<MenuItem> => {
+    const response = await apiClient.put<ApiResponse<MenuItem>>(`/menu/items/${id}`, { sortOrder });
+    return response.data.data;
+  },
 };
