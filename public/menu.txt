@@ -1,0 +1,138 @@
+{
+  "restaurante": "La Pizzería del Antonio",
+  "telefono": "675 03 02 01",
+  "nota_pizzas": "Todas las pizzas llevan tomate, mozzarella y orégano salvo las que llevan otras salsas como ingrediente base. Cada ingrediente extra: +0,50€ (Gambas: 1€)",
+  "menu": [
+    {
+      "grupo": "ENSALADAS",
+      "platos": [
+        { "orden": 1, "nombre": "Primavera",  "ingredientes": "lechuga, tomate, york, atún y mozzarella", "precio": 7.00 },
+        { "orden": 2, "nombre": "Caprichosa", "ingredientes": "lechuga, tomate, atún, piña, champiñón y mozzarella", "precio": 7.00 }
+      ]
+    },
+    {
+      "grupo": "BOCATAS",
+      "platos": [
+        { "orden": 1, "nombre": "Extremeño", "ingredientes": "tomate, aceite y jamón serrano", "precio": null },
+        { "orden": 2, "nombre": "Malagueño", "ingredientes": "tomate, atún y anchoas", "precio": null },
+        { "orden": 3, "nombre": "Árabe",     "ingredientes": "tomate, carne kebab, salsa yogurt y lechuga", "precio": null },
+        { "orden": 4, "nombre": "Serrano",   "ingredientes": "tomate, aceite, jamón, lomo fresco, queso y pimiento", "precio": 4.50 },
+        { "orden": 5, "nombre": "Crujiente", "ingredientes": "pechuga de pollo empanado, tomate y lechuga", "precio": 4.50 }
+      ]
+    },
+    {
+      "grupo": "CAMPEROS FAMILIARES",
+      "platos": [
+        { "orden": 1, "nombre": "Serrano", "ingredientes": "jamón serrano, queso, bacon, lomo fresco, tortilla y mahonesa", "precio": null },
+        { "orden": 2, "nombre": "Kebab",   "ingredientes": "jamón serrano, queso, carne kebap y salsa yogurt", "precio": null }
+      ]
+    },
+    {
+      "grupo": "CAMPEROS",
+      "nota": "Todos los camperos llevan lechuga, tomate y mahonesa",
+      "platos": [
+        { "orden": 1, "nombre": "Campero 4", "ingredientes": "carne de kebab, jamón serrano, jamón york y queso", "precio": 6.00 },
+        { "orden": 2, "nombre": "Campero 5", "ingredientes": "lomo fresco, jamón serrano, jamón york, queso y salsa", "precio": 6.00 },
+        { "orden": 3, "nombre": "Campero 6", "ingredientes": "jamón serrano, queso, bacon, lomo, tortilla y mahonesa", "precio": 6.00 },
+        { "orden": 4, "nombre": "Campero 7", "ingredientes": "lomo fresco, jamón serrano, jamón york, tortilla, queso y salsa", "precio": 6.00 },
+        { "orden": 5, "nombre": "Campero 8", "ingredientes": "jamón york, queso, tortilla y hamburguesa rebozada", "precio": 6.00 }
+      ]
+    },
+    {
+      "grupo": "RACIONES",
+      "platos": [
+        { "orden": 1,  "nombre": "Cachopo de ternera",  "ingredientes": null, "precio_media": null, "precio_entera": 14.00 },
+        { "orden": 2,  "nombre": "Carrillada al horno", "ingredientes": null, "precio_media": 8.00, "precio_entera": 14.00 },
+        { "orden": 3,  "nombre": "Lagarto al ajillo",   "ingredientes": null, "precio_media": 8.00, "precio_entera": 14.00 },
+        { "orden": 4,  "nombre": "Carne monte",         "ingredientes": null, "precio_media": 8.00, "precio_entera": 14.00 },
+        { "orden": 5,  "nombre": "Flamenquín casero",   "ingredientes": null, "precio_media": null, "precio_entera": 9.00 },
+        { "orden": 6,  "nombre": "Croquetas caseras",   "ingredientes": null, "precio_media": 7.00, "precio_entera": 12.00 },
+        { "orden": 7,  "nombre": "Rollitos",            "ingredientes": null, "precio_media": 7.00, "precio_entera": 12.00 },
+        { "orden": 8,  "nombre": "Alitas barbacoa",     "ingredientes": null, "precio_media": 7.00, "precio_entera": 12.00 },
+        { "orden": 9,  "nombre": "Finger de pollo",     "ingredientes": null, "precio_media": 7.00, "precio_entera": 12.00 },
+        { "orden": 10, "nombre": "Cazón en adobo",      "ingredientes": null, "precio_media": 7.00, "precio_entera": 12.00 },
+        { "orden": 11, "nombre": "Rabas de calamar",    "ingredientes": null, "precio_media": 7.00, "precio_entera": null },
+        { "orden": 12, "nombre": "Patatas bravas",      "ingredientes": null, "precio_media": null, "precio_entera": 8.00 },
+        { "orden": 13, "nombre": "Patatas cheddar",     "ingredientes": "patatas fritas, bacon y salsa cheddar", "precio_media": null, "precio_entera": 8.50 }
+      ]
+    },
+    {
+      "grupo": "PIZZAS",
+      "nota": "Todas llevan tomate, mozzarella y orégano. Cada ingrediente extra: +0,50€ (Gambas: 1€)",
+      "platos": [
+        { "orden": 1,  "nombre": "Atún",               "ingredientes": "atún", "precio": 8.00 },
+        { "orden": 2,  "nombre": "Bambini",             "ingredientes": "jamón york", "precio": 8.00 },
+        { "orden": 3,  "nombre": "Hawai",               "ingredientes": "jamón york y piña", "precio": 9.00 },
+        { "orden": 4,  "nombre": "Bolonesa",            "ingredientes": "carne picada", "precio": 9.00 },
+        { "orden": 5,  "nombre": "Bacon",               "ingredientes": "bacon", "precio": 9.00 },
+        { "orden": 6,  "nombre": "Topi",                "ingredientes": "carne de pollo", "precio": 9.00 },
+        { "orden": 7,  "nombre": "Caprichosa",          "ingredientes": "jamón york y champiñón", "precio": 10.00 },
+        { "orden": 8,  "nombre": "Cowboy",              "ingredientes": "bacon, salchichas y huevo", "precio": 10.00 },
+        { "orden": 9,  "nombre": "Chicago",             "ingredientes": "bacon, jamón york y salchichas", "precio": 10.00 },
+        { "orden": 10, "nombre": "Bambi Kebab",         "ingredientes": "jamón york y carne kebap", "precio": 10.00 },
+        { "orden": 11, "nombre": "Marinera",            "ingredientes": "gambas, pimiento rojo y pique", "precio": 10.00 },
+        { "orden": 12, "nombre": "Alegrías",            "ingredientes": "carne picada, champiñón y huevo", "precio": 10.00 },
+        { "orden": 13, "nombre": "4 Quesos",            "ingredientes": "cuatro quesos diferentes", "precio": 10.00 },
+        { "orden": 14, "nombre": "Tres Sabores",        "ingredientes": "bacon, jamón serrano y salchichas", "precio": 10.00 },
+        { "orden": 15, "nombre": "Roquefort",           "ingredientes": "bacon y roquefort", "precio": 10.00 },
+        { "orden": 16, "nombre": "Carbonara",           "ingredientes": "nata, champiñón, bacon y cebolla", "precio": 10.00 },
+        { "orden": 17, "nombre": "Gallega",             "ingredientes": "atún, pimiento, cebolla y huevo", "precio": 10.00 },
+        { "orden": 18, "nombre": "Suprema de la Casa",  "ingredientes": "salsa barbacoa, nata, carne de pollo, champiñón y cebolla", "precio": 10.00 },
+        { "orden": 19, "nombre": "Barbacoa",            "ingredientes": "salsa barbacoa, carne picada, bacon y cebolla", "precio": 10.00 },
+        { "orden": 20, "nombre": "Kebab",               "ingredientes": "salsa yogurt, champiñón y carne de kebab", "precio": 10.00 },
+        { "orden": 21, "nombre": "Pata Negra",          "ingredientes": "jamón serrano, mozzarella, aceite de oliva y tomate natural", "precio": 10.00 },
+        { "orden": 22, "nombre": "Romana",              "ingredientes": "champiñón, jamón serrano, alcachofa, pimiento y cebolla", "precio": 11.00 },
+        { "orden": 23, "nombre": "4 Estaciones",        "ingredientes": "champiñón, jamón york, atún, anchoas, cebolla y huevo", "precio": 11.00 },
+        { "orden": 24, "nombre": "La del Antonio",      "ingredientes": "4 quesos, bacon y cebolla", "precio": 11.00 },
+        { "orden": 25, "nombre": "Especial de la Casa", "ingredientes": "salmón, gambas y palmito", "precio": 11.00 },
+        { "orden": 26, "nombre": "Italiana",            "ingredientes": "nata, tomate, pique, bacon, 4 quesos y huevo", "precio": 11.00 },
+        { "orden": 27, "nombre": "Calzone",             "ingredientes": "champiñón, jamón serrano, huevo, cebolla y mozarella", "precio": 11.00 },
+        { "orden": 28, "nombre": "Suprema de Kebab",    "ingredientes": "salsa yogurt, barbacoa, carne de kebab y cebolla", "precio": 11.00 },
+        { "orden": 29, "nombre": "Rockera",             "ingredientes": "bacon, tres quesos y carne de kebab", "precio": 11.00 },
+        { "orden": 30, "nombre": "RollingStone",        "ingredientes": "queso philadelphia, bacon, pollo, cebolla caramelizada y salsa barbacoa", "precio": 11.00 },
+        { "orden": 31, "nombre": "Metallica",           "ingredientes": "queso philadelphia, cheddar, parmesano, emmental y gouda", "precio": 11.00 },
+        { "orden": 32, "nombre": "Ramones",             "ingredientes": "salsa gaucha, bacon, kebab, maíz y tomate natural", "precio": 11.00 },
+        { "orden": 33, "nombre": "Iron Maiden",         "ingredientes": "queso philadelphia, cebolla caramelizada y rulo de cabra", "precio": 11.00 },
+        { "orden": 34, "nombre": "AC/DC",               "ingredientes": "queso philadelphia, champiñón, bacon y pollo", "precio": 11.00 },
+        { "orden": 35, "nombre": "Barricada",           "ingredientes": "bacon, peperoni, jamón york y carne picada", "precio": 11.00 },
+        { "orden": 36, "nombre": "Extremoduro",         "ingredientes": "queso philadelphia, bacon, kebab, 3 quesos y salsa cheddar", "precio": 11.00 },
+        { "orden": 37, "nombre": "Marea",               "ingredientes": "queso philadelphia, salmón y gambas", "precio": 11.00 },
+        { "orden": 38, "nombre": "Cabronazo",           "ingredientes": "queso philadelphia, rulo de cabra, cebolla caramelizada, jamón serrano y tomate natural", "precio": 12.00 }
+      ]
+    },
+    {
+      "grupo": "COMBINADOS KEBAB",
+      "platos": [
+        { "orden": 1, "nombre": "Döner Shawarma",            "ingredientes": "kebab de pollo, ternera o mixto", "precio": null },
+        { "orden": 2, "nombre": "Kebab de pollo",            "ingredientes": null, "precio": 6.00 },
+        { "orden": 3, "nombre": "Durum crujiente",           "ingredientes": null, "precio": 7.00 },
+        { "orden": 4, "nombre": "Combinado kebab",           "ingredientes": "patatas fritas, kebab y salsa yogurt", "precio_mediano": 4.50, "precio_grande": 8.50 },
+        { "orden": 5, "nombre": "Combinado heavy",           "ingredientes": "patatas fritas, kebab, salsa cheddar y huevo", "precio_mediano": 5.00, "precio_grande": 7.50 },
+        { "orden": 6, "nombre": "Combinado rockero",         "ingredientes": "patatas fritas, kebab, salsa gaucha y huevo", "precio_mediano": 5.00, "precio_grande": 7.50 },
+        { "orden": 7, "nombre": "Combinado especial",        "ingredientes": "extra de kebab, mozzarella y salsa barbacoa", "precio_mediano": 6.00, "precio_grande": 8.50 },
+        { "orden": 8, "nombre": "Combinado bravas especial", "ingredientes": "patatas bravas, kebab, salsa yogurt, barbacoa y huevo", "precio_mediano": 5.00, "precio_grande": 8.00 }
+      ]
+    },
+    {
+      "grupo": "BURGERS",
+      "platos": [
+        { "orden": 1, "nombre": "Burger Crispy",                    "ingredientes": "bacon crujiente, salsa barbacoa, cebolla crujiente, queso gouda", "precio": 11.95 },
+        { "orden": 2, "nombre": "Burger de Pollo Rebozado Normal",   "ingredientes": "burger, lechuga, queso y tomate", "precio": 3.50 },
+        { "orden": 3, "nombre": "Burger de Pollo Rebozado Completa", "ingredientes": "burger, bacon, york, queso, lomo, lechuga, tomate y huevo", "precio": 4.90 },
+        { "orden": 4, "nombre": "Burger de Cerdo 125g Normal",       "ingredientes": "burger, bacon, queso, lomo, lechuga, tomate y huevo", "precio": 3.50 },
+        { "orden": 5, "nombre": "Burger de Cerdo 125g Completa",     "ingredientes": "burger, bacon, york, queso, lomo adobado, lechuga, tomate y huevo", "precio": 4.50 },
+        { "orden": 6, "nombre": "Burger Especial",                   "ingredientes": "burger, bacon, queso, lomo, lomo adobado, tortilla y huevo", "precio": 4.00 }
+      ]
+    },
+    {
+      "grupo": "BOCATAS MALAGUEÑOS",
+      "platos": [
+        { "orden": 1, "nombre": "Mollete 4", "ingredientes": "pan, jamón cocido, queso, kebab, huevo frito y salsa gaucha", "precio": null },
+        { "orden": 2, "nombre": "Mollete 5", "ingredientes": "pan, jamón cocido, queso, lomo adobado, tortilla y al oil", "precio": 7.50 },
+        { "orden": 3, "nombre": "Mollete 6", "ingredientes": "pan, jamón cocido, queso, lomo adobado, tortilla y al oil", "precio": 7.50 },
+        { "orden": 4, "nombre": "Mollete 7", "ingredientes": "pan, salmón, jamón cocido, queso cheddar, hamburguesa 125g, bacon, tortilla y salsa gaucha", "precio": 8.00 },
+        { "orden": 5, "nombre": "Mollete 8", "ingredientes": "pan, jamón serrano, pimientos fritos, lomo fresco, tortilla y al oil", "precio": 8.00 }
+      ]
+    }
+  ]
+}
