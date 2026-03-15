@@ -77,6 +77,20 @@ export function Footer() {
             Hecho con 🎸 y mucha mozzarella
           </p>
         </div>
+
+        <div className="mt-6 pt-6 border-t border-rock-border/50 text-center">
+          <p className="text-rock-metal text-xs">
+            Sitio web realizado por{' '}
+            <a
+              href="https://github.com/wguicha"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-rock-red hover:text-rock-red-bright transition-colors"
+            >
+              WilliamGDev
+            </a>
+          </p>
+        </div>
       </div>
     </footer>
   );
