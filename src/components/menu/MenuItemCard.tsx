@@ -78,7 +78,7 @@ export function MenuItemCard({ item, categorySlug }: MenuItemCardProps) {
               </span>
               <button
                 onClick={() => handleAdd()}
-                className="flex items-center gap-1 bg-rock-red/10 hover:bg-rock-red border border-rock-red/50 hover:border-rock-red text-rock-red hover:text-white px-3 py-1.5 text-xs transition-all duration-150"
+                className="flex items-center gap-1 bg-rock-red/10 hover:bg-rock-red border border-rock-red/50 hover:border-rock-red text-rock-red hover:text-white px-4 py-2 text-sm font-semibold transition-all duration-150"
                 style={{ fontFamily: "'Bebas Neue', Impact, sans-serif", letterSpacing: '0.08em' }}
                 aria-label={`Añadir ${item.name} al carrito`}
               >
@@ -99,11 +99,11 @@ export function MenuItemCard({ item, categorySlug }: MenuItemCardProps) {
               <span className="text-rock-metal text-xs italic">Consultar precio</span>
               <button
                 onClick={() => handleAdd()}
-                className="flex items-center gap-1 bg-rock-red/10 hover:bg-rock-red border border-rock-red/50 hover:border-rock-red text-rock-red hover:text-white px-3 py-1.5 text-xs transition-all duration-150"
+                className="flex items-center gap-1 bg-rock-red/10 hover:bg-rock-red border border-rock-red/50 hover:border-rock-red text-rock-red hover:text-white px-4 py-2 text-sm font-semibold transition-all duration-150"
                 style={{ fontFamily: "'Bebas Neue', Impact, sans-serif", letterSpacing: '0.08em' }}
                 aria-label={`Añadir ${item.name} al carrito`}
               >
-                {added === 'single' ? <span className="text-green-400">✓</span> : <><span aria-hidden="true">+</span> AÑADIR</>}
+                {added === 'single' ? <span className="text-green-400">✓ AÑADIDO</span> : <><span aria-hidden="true">+</span> AÑADIR</>}
               </button>
             </div>
           )}
@@ -124,11 +124,11 @@ export function MenuItemCard({ item, categorySlug }: MenuItemCardProps) {
                   </div>
                   <button
                     onClick={() => handleAdd('half')}
-                    className="bg-rock-red/10 hover:bg-rock-red border border-rock-red/50 hover:border-rock-red text-rock-red hover:text-white px-3 py-1 text-xs transition-all duration-150"
+                    className="bg-rock-red/10 hover:bg-rock-red border border-rock-red/50 hover:border-rock-red text-rock-red hover:text-white px-4 py-2 text-sm font-semibold transition-all duration-150"
                     style={{ fontFamily: "'Bebas Neue', Impact, sans-serif", letterSpacing: '0.08em' }}
                     aria-label={`Añadir media ración de ${item.name}`}
                   >
-                    {added === 'half' ? '✓' : '+ MEDIA'}
+                    {added === 'half' ? '✓ OK' : '+ MEDIA'}
                   </button>
                 </div>
               )}
@@ -145,11 +145,11 @@ export function MenuItemCard({ item, categorySlug }: MenuItemCardProps) {
                   </div>
                   <button
                     onClick={() => handleAdd('full')}
-                    className="bg-rock-red/10 hover:bg-rock-red border border-rock-red/50 hover:border-rock-red text-rock-red hover:text-white px-3 py-1 text-xs transition-all duration-150"
+                    className="bg-rock-red/10 hover:bg-rock-red border border-rock-red/50 hover:border-rock-red text-rock-red hover:text-white px-4 py-2 text-sm font-semibold transition-all duration-150"
                     style={{ fontFamily: "'Bebas Neue', Impact, sans-serif", letterSpacing: '0.08em' }}
                     aria-label={`Añadir ración entera de ${item.name}`}
                   >
-                    {added === 'full' ? '✓' : '+ ENTERA'}
+                    {added === 'full' ? '✓ OK' : '+ ENTERA'}
                   </button>
                 </div>
               )}
