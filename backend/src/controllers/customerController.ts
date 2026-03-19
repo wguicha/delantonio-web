@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
 import { prisma } from '../config/database';
-import { normalizeSpanishPhone } from '../services/phoneValidationService';
+import { normalizePhone } from '../services/phoneValidationService';
 
 export async function lookupCustomerByPhone(req: Request, res: Response): Promise<void> {
   const phone = req.query.phone as string;
@@ -10,7 +10,7 @@ export async function lookupCustomerByPhone(req: Request, res: Response): Promis
     return;
   }
 
-  const normalized = normalizeSpanishPhone(phone);
+  const normalized = normalizePhone(phone);
   if (!normalized) {
     res.status(400).json({ success: false, message: 'Invalid phone format' });
     return;
@@ -61,7 +61,7 @@ export async function requestDataDeletion(req: Request, res: Response): Promise<
     return;
   }
 
-  const normalized = normalizeSpanishPhone(parsed.data.phone);
+  const normalized = normalizePhone(parsed.data.phone);
   if (!normalized) {
     res.status(400).json({ success: false, message: 'Invalid phone format' });
     return;

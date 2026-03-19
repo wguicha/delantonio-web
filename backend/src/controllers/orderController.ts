@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { z } from 'zod';
 import { prisma } from '../config/database';
 import { whatsappService } from '../services/whatsappService';
-import { normalizeSpanishPhone, isValidSpanishPhone } from '../services/phoneValidationService';
+import { normalizePhone, isValidPhone } from '../services/phoneValidationService';
 import { OrderStatus } from '@prisma/client';
 
 // Shared emitter for real-time SSE — one event per order change
@@ -51,12 +51,12 @@ export async function createOrder(req: Request, res: Response): Promise<void> {
   const { customer, pickupTime, notes, items, latitude, longitude } = parsed.data;
 
   // Validate phone
-  if (!isValidSpanishPhone(customer.phone)) {
-    res.status(400).json({ success: false, message: 'Número de teléfono no válido. Debe ser un número español.' });
+  if (!isValidPhone(customer.phone)) {
+    res.status(400).json({ success: false, message: 'Número de teléfono no válido.' });
     return;
   }
 
-  const normalizedPhone = normalizeSpanishPhone(customer.phone)!;
+  const normalizedPhone = normalizePhone(customer.phone)!;
 
   // Validate pickup time (minimum advance)
   const pickup = new Date(pickupTime);

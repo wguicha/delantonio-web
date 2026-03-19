@@ -13,10 +13,9 @@ import type { Order } from '../types';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
-function isValidSpanishPhone(phone: string): boolean {
-  const cleaned = phone.replace(/[\s\-.]/g, '');
-  const withoutPrefix = cleaned.replace(/^(\+34|0034)/, '');
-  return /^\d{9}$/.test(withoutPrefix) && /^[679]/.test(withoutPrefix);
+function isValidPhone(phone: string): boolean {
+  const cleaned = phone.replace(/[\s\-\.\(\)]/g, '').replace(/^\+/, '');
+  return /^\d{7,15}$/.test(cleaned);
 }
 
 function getMinPickupTime(): string {
@@ -34,8 +33,8 @@ function formatPrice(price: number): string {
 const orderSchema = z.object({
   phone: z
     .string()
-    .min(9, 'Teléfono inválido')
-    .refine(isValidSpanishPhone, 'Número español inválido (ej: 612 345 678)'),
+    .min(7, 'Teléfono inválido')
+    .refine(isValidPhone, 'Teléfono inválido (ej: +34612345678 o +351912345678)'),
   name: z.string().min(2, 'Mínimo 2 caracteres').max(100, 'Máximo 100 caracteres'),
   pickupTime: z
     .string()

@@ -1,25 +1,28 @@
 /**
- * Validates Spanish phone numbers.
- * Spanish mobile numbers start with 6 or 7, landlines with 9.
- * Format: 9 digits, optionally prefixed with +34 or 0034
+ * Validates and normalizes international phone numbers.
+ * Accepts any number with country code (e.g. +34612345678, 34612345678, +351912345678)
+ * Minimum 7 digits, maximum 15 digits (ITU-T E.164)
  */
-export function normalizeSpanishPhone(phone: string): string | null {
-  // Remove spaces, dashes, dots
-  const cleaned = phone.replace(/[\s\-\.]/g, '');
+export function normalizePhone(phone: string): string | null {
+  // Remove spaces, dashes, dots, parentheses
+  const cleaned = phone.replace(/[\s\-\.\(\)]/g, '');
 
-  // Remove country code prefix if present
-  const withoutPrefix = cleaned.replace(/^(\+34|0034)/, '');
+  // Remove leading +
+  const withoutPlus = cleaned.replace(/^\+/, '');
 
-  // Must be exactly 9 digits
-  if (!/^\d{9}$/.test(withoutPrefix)) return null;
+  // Must be only digits now
+  if (!/^\d+$/.test(withoutPlus)) return null;
 
-  // Must start with 6, 7 (mobile) or 9 (landline)
-  if (!/^[679]/.test(withoutPrefix)) return null;
+  // E.164: 7 to 15 digits
+  if (withoutPlus.length < 7 || withoutPlus.length > 15) return null;
 
-  // Return normalized with country code
-  return `34${withoutPrefix}`;
+  return withoutPlus;
 }
 
-export function isValidSpanishPhone(phone: string): boolean {
-  return normalizeSpanishPhone(phone) !== null;
+export function isValidPhone(phone: string): boolean {
+  return normalizePhone(phone) !== null;
 }
+
+// Legacy aliases kept for backwards compatibility
+export const normalizeSpanishPhone = normalizePhone;
+export const isValidSpanishPhone = isValidPhone;
