@@ -72,11 +72,17 @@ export async function createOrder(req: Request, res: Response): Promise<void> {
   }
 
   // Validate pickup time within opening hours (from DB schedule)
+  // Parse date/time directly from the string (frontend sends YYYY-MM-DDTHH:MM in local time)
   const schedule = await getScheduleData();
-  const pickupLocal = new Date(pickup.toLocaleString('en-US', { timeZone: 'Europe/Madrid' }));
-  const pickupDay = pickupLocal.getDay();
-  const pickupHour = pickupLocal.getHours();
-  const pickupMinute = pickupLocal.getMinutes();
+  const dateMatch = pickupTime.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+  if (!dateMatch) {
+    res.status(400).json({ success: false, message: 'Formato de hora inválido.' });
+    return;
+  }
+  const [, year, month, day, hourStr, minuteStr] = dateMatch;
+  const pickupDay = new Date(parseInt(year), parseInt(month) - 1, parseInt(day)).getDay();
+  const pickupHour = parseInt(hourStr);
+  const pickupMinute = parseInt(minuteStr);
   const pickupTotalMinutes = pickupHour * 60 + pickupMinute;
   const daySchedule = schedule.days.find((d) => d.day === pickupDay);
 
