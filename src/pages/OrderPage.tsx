@@ -15,10 +15,6 @@ import type { Order } from '../types';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
-function isValidPhone(phone: string): boolean {
-  const cleaned = phone.replace(/[\s\-\.\(\)]/g, '').replace(/^\+/, '');
-  return /^\d{7,15}$/.test(cleaned);
-}
 
 function getPizzeriaStatus(schedule: Schedule): { open: boolean; message: string | null } {
   const now = new Date();
