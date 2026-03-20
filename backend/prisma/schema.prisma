@@ -84,6 +84,12 @@ model Admin {
   updatedAt DateTime @updatedAt
 }
 
+model Settings {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
 enum OrderStatus {
   PENDING
   PREPARING

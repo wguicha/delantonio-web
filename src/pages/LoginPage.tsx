@@ -79,7 +79,7 @@ export function LoginPage() {
               </label>
               <input
                 id="password"
-                type="text"
+                type="password"
                 autoComplete="current-password"
                 className="w-full bg-rock-dark border border-rock-border text-rock-white px-4 py-3 focus:outline-none focus:border-rock-red transition-colors"
                 {...register('password')}

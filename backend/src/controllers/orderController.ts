@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { prisma } from '../config/database';
 import { whatsappService } from '../services/whatsappService';
 import { normalizePhone, isValidPhone } from '../services/phoneValidationService';
+import { getScheduleData } from './scheduleController';
 import { OrderStatus } from '@prisma/client';
 
 // Shared emitter for real-time SSE — one event per order change
@@ -70,6 +71,34 @@ export async function createOrder(req: Request, res: Response): Promise<void> {
     return;
   }
 
+  // Validate pickup time within opening hours (from DB schedule)
+  const schedule = await getScheduleData();
+  const pickupLocal = new Date(pickup.toLocaleString('en-US', { timeZone: 'Europe/Madrid' }));
+  const pickupDay = pickupLocal.getDay();
+  const pickupHour = pickupLocal.getHours();
+  const pickupMinute = pickupLocal.getMinutes();
+  const pickupTotalMinutes = pickupHour * 60 + pickupMinute;
+  const daySchedule = schedule.days.find((d) => d.day === pickupDay);
+
+  if (!daySchedule || !daySchedule.isOpen) {
+    res.status(400).json({ success: false, message: 'Lo sentimos, ese día estamos cerrados.' });
+    return;
+  }
+
+  const [openH, openM] = daySchedule.openTime.split(':').map(Number);
+  const [closeH, closeM] = daySchedule.closeTime.split(':').map(Number);
+  const openMinutes = openH * 60 + openM;
+  const closeMinutes = closeH * 60 + closeM;
+  const lastOrderMinutes = closeMinutes - schedule.lastOrderMinutesBefore;
+
+  if (pickupTotalMinutes < openMinutes || pickupTotalMinutes > lastOrderMinutes) {
+    res.status(400).json({
+      success: false,
+      message: `La hora de recogida debe estar entre las ${daySchedule.openTime} y las ${Math.floor(lastOrderMinutes / 60).toString().padStart(2, '0')}:${(lastOrderMinutes % 60).toString().padStart(2, '0')} (último pedido).`,
+    });
+    return;
+  }
+
   // Geolocation check (optional - if coords provided)
   if (latitude !== undefined && longitude !== undefined) {
     const pizzeriaLat = parseFloat(process.env.PIZZERIA_LAT ?? '36.7213');
@@ -92,13 +121,16 @@ export async function createOrder(req: Request, res: Response): Promise<void> {
       status: { in: ['PENDING', 'PREPARING'] },
     },
   });
-  if (activeOrders >= 3) {
+  if (activeOrders >= 1) {
     res.status(400).json({
       success: false,
-      message: 'Ya tienes demasiados pedidos activos. Por favor espera a que se completen.',
+      message: 'Ya tienes un pedido activo. Por favor espera a que se complete antes de hacer otro.',
     });
     return;
   }
+
+  // Validate max order amount
+  const maxOrderAmount = parseFloat(process.env.MAX_ORDER_AMOUNT ?? '50');
 
   // Get menu items and calculate total
   const menuItems = await prisma.menuItem.findMany({
@@ -126,6 +158,14 @@ export async function createOrder(req: Request, res: Response): Promise<void> {
       notes: item.notes ?? null,
     };
   });
+
+  // Check if customer is new (no previous orders)
+  const existingCustomer = await prisma.customer.findUnique({
+    where: { phone: normalizedPhone },
+    include: { _count: { select: { orders: true } } },
+  });
+  const isNewCustomer = !existingCustomer || existingCustomer._count.orders === 0;
+  const requiresReview = isNewCustomer && totalAmount > maxOrderAmount;
 
   // Upsert customer
   const dbCustomer = await prisma.customer.upsert({
@@ -172,7 +212,8 @@ export async function createOrder(req: Request, res: Response): Promise<void> {
     normalizedPhone,
     itemsSummary,
     totalAmount,
-    pickupFormatted
+    pickupFormatted,
+    requiresReview
   ).catch(console.error);
 
   whatsappService.confirmOrderToCustomer(
@@ -230,7 +271,6 @@ export async function updateOrderStatus(req: Request, res: Response): Promise<vo
 
     orderEmitter.emit('order:change', order);
 
-    // Notify customer via WhatsApp when order is ready to pick up
     if (status === 'READY') {
       const pickupFormatted = new Date(order.pickupTime).toLocaleTimeString('es-ES', {
         hour: '2-digit',
@@ -238,6 +278,12 @@ export async function updateOrderStatus(req: Request, res: Response): Promise<vo
       });
       whatsappService
         .notifyOrderReady(order.customer.phone, order.customer.name, pickupFormatted)
+        .catch(console.error);
+    }
+
+    if (status === 'COMPLETED') {
+      whatsappService
+        .thankCustomer(order.customer.phone, order.customer.name)
         .catch(console.error);
     }
 

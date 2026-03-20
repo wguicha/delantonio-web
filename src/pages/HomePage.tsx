@@ -357,7 +357,7 @@ export function HomePage() {
             una banda legendaria porque, como el buen rock, está hecha con ingredientes
             auténticos, actitud y sin compromisos.
             <br /><br />
-            Masa artesana, ingredientes frescos y el volumen siempre al máximo.
+            Masa artesanal, ingredientes frescos y el volumen siempre al máximo.
           </p>
           <Link
             to="/pedir"

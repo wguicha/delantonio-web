@@ -44,14 +44,19 @@ async function sendWhatsAppMessage({ to, message }: WhatsAppMessage): Promise<bo
 }
 
 export const whatsappService = {
-  notifyAdmin: async (orderId: string, customerName: string, phone: string, items: string, total: number, pickupTime: string): Promise<void> => {
+  notifyAdmin: async (orderId: string, customerName: string, phone: string, items: string, total: number, pickupTime: string, requiresReview = false): Promise<void> => {
+    const reviewAlert = requiresReview
+      ? `\n⚠️ *CLIENTE NUEVO CON PEDIDO ALTO — CONFIRMAR POR TELÉFONO*\n`
+      : '';
+
     const message = `🍕 *NUEVO PEDIDO - Del Antonio*\n\n` +
       `📋 Pedido: #${orderId.slice(-6).toUpperCase()}\n` +
       `👤 Cliente: ${customerName}\n` +
       `📱 Teléfono: ${phone}\n` +
       `🕐 Recogida: ${pickupTime}\n\n` +
       `*Artículos:*\n${items}\n\n` +
-      `💰 *Total: ${total.toFixed(2)}€*\n\n` +
+      `💰 *Total: ${total.toFixed(2)}€*` +
+      reviewAlert + `\n` +
       `Panel: https://pizzeriadelantonio.es/admin`;
 
     await sendWhatsAppMessage({
@@ -67,6 +72,18 @@ export const whatsappService = {
       `🕐 Podrás recogerlo a las *${pickupTime}*.\n` +
       `💰 Total: *${total.toFixed(2)}€*\n\n` +
       `¡Gracias por tu pedido! 🎸`;
+
+    await sendWhatsAppMessage({ to: phone, message });
+  },
+
+  thankCustomer: async (phone: string, customerName: string): Promise<void> => {
+    const mapsUrl = process.env.GOOGLE_MAPS_REVIEW_URL ?? '';
+    const message = `🤘 *¡Gracias por tu pedido, ${customerName}!*\n\n` +
+      `🍕 *Pizzería Del Antonio*\n\n` +
+      `Esperamos que lo hayas disfrutado al máximo.\n` +
+      `Si te ha gustado, ¡nos ayudaría muchísimo que nos dejaras una reseña!\n\n` +
+      `⭐ ${mapsUrl}\n\n` +
+      `¡Hasta la próxima! 🎸`;
 
     await sendWhatsAppMessage({ to: phone, message });
   },

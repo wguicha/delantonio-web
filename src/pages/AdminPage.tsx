@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { orderService } from '../services/orderService';
 import { menuService } from '../services/menuService';
+import { scheduleService } from '../services/scheduleService';
+import type { Schedule } from '../services/scheduleService';
 import { API_BASE_URL } from '../services/api';
 import { Logo } from '../components/layout/Logo';
 import type { Order, OrderStatus, Category, MenuItem, Customer } from '../types';
@@ -34,7 +36,7 @@ const STATUS_BORDER: Record<OrderStatus, string> = {
 };
 
 type OrderFilter = 'active' | OrderStatus;
-type AdminTab = 'orders' | 'menu' | 'customers';
+type AdminTab = 'orders' | 'menu' | 'customers' | 'schedule';
 
 function formatPrice(price: number): string {
   return price.toFixed(2).replace('.', ',') + '€';
@@ -84,6 +86,20 @@ export function AdminPage() {
   } | null>(null);
   const [savingItemId, setSavingItemId] = useState<string | null>(null);
   const [reorderingItemId, setReorderingItemId] = useState<string | null>(null);
+
+  // Schedule state
+  const [schedule, setSchedule] = useState<Schedule | null>(null);
+  const [savingSchedule, setSavingSchedule] = useState(false);
+
+  // New category form
+  const [showNewCategory, setShowNewCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [savingCategory, setSavingCategory] = useState(false);
+
+  // New item form
+  const [showNewItem, setShowNewItem] = useState(false);
+  const [newItem, setNewItem] = useState({ name: '', description: '', price: '', priceHalf: '', priceFull: '' });
+  const [savingNewItem, setSavingNewItem] = useState(false);
 
   // ── Customers state
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -289,6 +305,70 @@ export function AdminPage() {
     }
   };
 
+  // ── Load & save schedule
+  useEffect(() => {
+    if (activeTab !== 'schedule' || schedule) return;
+    scheduleService.getSchedule().then(setSchedule);
+  }, [activeTab, schedule]);
+
+  const saveSchedule = async () => {
+    if (!schedule) return;
+    setSavingSchedule(true);
+    try {
+      const updated = await scheduleService.updateSchedule(schedule);
+      setSchedule(updated);
+      alert('Horario guardado correctamente.');
+    } catch {
+      alert('Error al guardar el horario.');
+    } finally {
+      setSavingSchedule(false);
+    }
+  };
+
+  // ── Create category
+  const createCategory = async () => {
+    if (!newCategoryName.trim()) return;
+    setSavingCategory(true);
+    try {
+      const created = await menuService.createCategory({ name: newCategoryName.trim() });
+      setCategories((prev) => [...prev, created]);
+      setActiveCategorySlug(created.slug);
+      setNewCategoryName('');
+      setShowNewCategory(false);
+    } catch {
+      alert('Error al crear la categoría.');
+    } finally {
+      setSavingCategory(false);
+    }
+  };
+
+  // ── Create menu item
+  const createItem = async () => {
+    if (!activeCategory || !newItem.name.trim()) return;
+    setSavingNewItem(true);
+    try {
+      const created = await menuService.createItem({
+        categoryId: activeCategory.id,
+        name: newItem.name.trim(),
+        description: newItem.description.trim() || undefined,
+        price: newItem.price ? parseFloat(newItem.price) : null,
+        priceHalf: newItem.priceHalf ? parseFloat(newItem.priceHalf) : null,
+        priceFull: newItem.priceFull ? parseFloat(newItem.priceFull) : null,
+      });
+      setCategories((prev) =>
+        prev.map((cat) =>
+          cat.id === activeCategory.id ? { ...cat, items: [...cat.items, created] } : cat
+        )
+      );
+      setNewItem({ name: '', description: '', price: '', priceHalf: '', priceFull: '' });
+      setShowNewItem(false);
+    } catch {
+      alert('Error al crear el producto.');
+    } finally {
+      setSavingNewItem(false);
+    }
+  };
+
   // ── Derived data
   const filteredOrders = orders.filter((o) =>
     orderFilter === 'active'
@@ -323,6 +403,7 @@ export function AdminPage() {
               { id: 'orders' as const, label: 'Pedidos', badge: counts.active },
               { id: 'menu' as const, label: 'Menú', badge: undefined },
               { id: 'customers' as const, label: 'Clientes', badge: undefined },
+              { id: 'schedule' as const, label: 'Horario', badge: undefined },
             ] as const
           ).map(({ id, label, badge }) => (
             <button
@@ -465,7 +546,7 @@ export function AdminPage() {
                   {categories.map((cat) => (
                     <button
                       key={cat.slug}
-                      onClick={() => { setActiveCategorySlug(cat.slug); setEditingItem(null); }}
+                      onClick={() => { setActiveCategorySlug(cat.slug); setEditingItem(null); setShowNewItem(false); }}
                       className={`px-3 py-1.5 border text-sm transition-all ${
                         activeCategorySlug === cat.slug
                           ? 'bg-rock-red border-rock-red text-white'
@@ -477,7 +558,42 @@ export function AdminPage() {
                       <span className="ml-1.5 text-xs opacity-60">({cat.items.length})</span>
                     </button>
                   ))}
+                  <button
+                    onClick={() => setShowNewCategory((v) => !v)}
+                    className="px-3 py-1.5 border border-dashed border-rock-border text-rock-metal text-sm hover:border-rock-gold hover:text-rock-gold transition-all"
+                    style={{ fontFamily: "'Bebas Neue', Impact, sans-serif", letterSpacing: '0.06em' }}
+                  >
+                    + Categoría
+                  </button>
                 </div>
+
+                {/* New category form */}
+                {showNewCategory && (
+                  <div className="flex gap-2 mb-4">
+                    <input
+                      type="text"
+                      value={newCategoryName}
+                      onChange={(e) => setNewCategoryName(e.target.value)}
+                      placeholder="Nombre de la categoría (ej: Bebidas)"
+                      className="flex-1 bg-rock-dark border border-rock-border text-rock-white px-3 py-2 text-sm focus:outline-none focus:border-rock-gold"
+                      onKeyDown={(e) => e.key === 'Enter' && createCategory()}
+                      autoFocus
+                    />
+                    <button
+                      onClick={createCategory}
+                      disabled={savingCategory || !newCategoryName.trim()}
+                      className="px-4 py-2 bg-rock-gold text-rock-black text-sm font-bold disabled:opacity-50"
+                    >
+                      {savingCategory ? '...' : 'Crear'}
+                    </button>
+                    <button
+                      onClick={() => { setShowNewCategory(false); setNewCategoryName(''); }}
+                      className="px-3 py-2 border border-rock-border text-rock-metal text-sm hover:text-rock-white"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
 
                 {activeCategory && (
                   <div className="bg-rock-card border border-rock-border overflow-hidden">
@@ -486,10 +602,78 @@ export function AdminPage() {
                         {activeCategory.items.filter((i) => i.isActive).length}/
                         {activeCategory.items.length} activos
                       </span>
-                      <span className="text-rock-metal text-xs opacity-60">
-                        Clic en el precio para editar
-                      </span>
+                      <div className="flex items-center gap-3">
+                        <span className="text-rock-metal text-xs opacity-60">Clic en el precio para editar</span>
+                        <button
+                          onClick={() => setShowNewItem((v) => !v)}
+                          className="text-rock-gold text-xs hover:underline"
+                        >
+                          + Nuevo producto
+                        </button>
+                      </div>
                     </div>
+
+                    {/* New item form */}
+                    {showNewItem && (
+                      <div className="px-4 py-3 border-b border-rock-border bg-rock-dark flex flex-col gap-2">
+                        <input
+                          type="text"
+                          value={newItem.name}
+                          onChange={(e) => setNewItem((p) => ({ ...p, name: e.target.value }))}
+                          placeholder="Nombre del producto *"
+                          className="w-full bg-rock-black border border-rock-border text-rock-white px-3 py-2 text-sm focus:outline-none focus:border-rock-red"
+                          autoFocus
+                        />
+                        <input
+                          type="text"
+                          value={newItem.description}
+                          onChange={(e) => setNewItem((p) => ({ ...p, description: e.target.value }))}
+                          placeholder="Descripción (opcional)"
+                          className="w-full bg-rock-black border border-rock-border text-rock-white px-3 py-2 text-sm focus:outline-none focus:border-rock-red"
+                        />
+                        <div className="flex gap-2">
+                          <input
+                            type="number"
+                            value={newItem.price}
+                            onChange={(e) => setNewItem((p) => ({ ...p, price: e.target.value }))}
+                            placeholder="Precio único €"
+                            className="flex-1 bg-rock-black border border-rock-border text-rock-white px-3 py-2 text-sm focus:outline-none focus:border-rock-red"
+                            step="0.01"
+                          />
+                          <input
+                            type="number"
+                            value={newItem.priceHalf}
+                            onChange={(e) => setNewItem((p) => ({ ...p, priceHalf: e.target.value }))}
+                            placeholder="½ ración €"
+                            className="flex-1 bg-rock-black border border-rock-border text-rock-white px-3 py-2 text-sm focus:outline-none focus:border-rock-red"
+                            step="0.01"
+                          />
+                          <input
+                            type="number"
+                            value={newItem.priceFull}
+                            onChange={(e) => setNewItem((p) => ({ ...p, priceFull: e.target.value }))}
+                            placeholder="Ración entera €"
+                            className="flex-1 bg-rock-black border border-rock-border text-rock-white px-3 py-2 text-sm focus:outline-none focus:border-rock-red"
+                            step="0.01"
+                          />
+                        </div>
+                        <div className="flex gap-2 justify-end">
+                          <button
+                            onClick={() => { setShowNewItem(false); setNewItem({ name: '', description: '', price: '', priceHalf: '', priceFull: '' }); }}
+                            className="px-3 py-1.5 border border-rock-border text-rock-metal text-xs hover:text-rock-white"
+                          >
+                            Cancelar
+                          </button>
+                          <button
+                            onClick={createItem}
+                            disabled={savingNewItem || !newItem.name.trim()}
+                            className="px-4 py-1.5 bg-rock-red text-white text-xs font-bold disabled:opacity-50"
+                          >
+                            {savingNewItem ? '...' : 'Añadir producto'}
+                          </button>
+                        </div>
+                      </div>
+                    )}
                     <ul className="divide-y divide-rock-border">
                       {activeCategory.items.map((item, index) => (
                         <MenuItemRow
@@ -601,6 +785,91 @@ export function AdminPage() {
             )}
           </div>
         )}
+        {/* ── SCHEDULE TAB ─────────────────────────────────────────────── */}
+        {activeTab === 'schedule' && (
+          <div>
+            <h1
+              className="text-rock-white mb-6"
+              style={{ fontFamily: "'Bebas Neue', Impact, sans-serif", fontSize: '2rem', letterSpacing: '0.1em' }}
+            >
+              HORARIO DE <span style={{ color: '#dc2626' }}>APERTURA</span>
+            </h1>
+
+            {!schedule ? (
+              <div className="flex justify-center py-20">
+                <div className="w-8 h-8 border-2 border-rock-border border-t-rock-red rounded-full animate-spin" />
+              </div>
+            ) : (
+              <div className="flex flex-col gap-4 max-w-lg">
+                {schedule.days.map((day, i) => (
+                  <div key={day.day} className="bg-rock-card border border-rock-border p-4 flex flex-col gap-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-rock-white font-medium" style={{ fontFamily: "'Bebas Neue', Impact, sans-serif", letterSpacing: '0.08em', fontSize: '1.1rem' }}>
+                        {day.name}
+                      </span>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <span className="text-rock-metal text-xs">{day.isOpen ? 'Abierto' : 'Cerrado'}</span>
+                        <div
+                          className={`relative w-10 h-5 rounded-full transition-colors cursor-pointer ${day.isOpen ? 'bg-rock-red' : 'bg-rock-border'}`}
+                          onClick={() => setSchedule((s) => s && { ...s, days: s.days.map((d, j) => j === i ? { ...d, isOpen: !d.isOpen } : d) })}
+                        >
+                          <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${day.isOpen ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                        </div>
+                      </label>
+                    </div>
+                    {day.isOpen && (
+                      <div className="flex items-center gap-3">
+                        <div className="flex flex-col gap-1">
+                          <label className="text-rock-metal text-xs">Apertura</label>
+                          <input
+                            type="time"
+                            value={day.openTime}
+                            onChange={(e) => setSchedule((s) => s && { ...s, days: s.days.map((d, j) => j === i ? { ...d, openTime: e.target.value } : d) })}
+                            className="bg-rock-dark border border-rock-border text-rock-white px-2 py-1.5 text-sm focus:outline-none focus:border-rock-red [color-scheme:dark]"
+                          />
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <label className="text-rock-metal text-xs">Cierre</label>
+                          <input
+                            type="time"
+                            value={day.closeTime}
+                            onChange={(e) => setSchedule((s) => s && { ...s, days: s.days.map((d, j) => j === i ? { ...d, closeTime: e.target.value } : d) })}
+                            className="bg-rock-dark border border-rock-border text-rock-white px-2 py-1.5 text-sm focus:outline-none focus:border-rock-red [color-scheme:dark]"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+
+                <div className="bg-rock-card border border-rock-border p-4 flex items-center justify-between">
+                  <div>
+                    <span className="text-rock-white text-sm">Último pedido</span>
+                    <p className="text-rock-metal text-xs">Minutos antes del cierre</p>
+                  </div>
+                  <input
+                    type="number"
+                    value={schedule.lastOrderMinutesBefore}
+                    min={0}
+                    max={120}
+                    onChange={(e) => setSchedule((s) => s && { ...s, lastOrderMinutesBefore: parseInt(e.target.value) || 0 })}
+                    className="w-20 bg-rock-dark border border-rock-border text-rock-white px-3 py-2 text-sm text-center focus:outline-none focus:border-rock-red"
+                  />
+                </div>
+
+                <button
+                  onClick={saveSchedule}
+                  disabled={savingSchedule}
+                  className="bg-rock-red text-white py-3 text-sm font-bold tracking-wider disabled:opacity-50"
+                  style={{ fontFamily: "'Bebas Neue', Impact, sans-serif", letterSpacing: '0.1em' }}
+                >
+                  {savingSchedule ? 'GUARDANDO...' : 'GUARDAR HORARIO'}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
       </div>
     </div>
   );
@@ -661,7 +930,7 @@ function OrderCard({ order, updating, onUpdateStatus }: OrderCardProps) {
           </li>
         ))}
         {order.notes && (
-          <li className="text-rock-metal text-xs italic pt-1 mt-1 border-t border-rock-border">
+          <li className="text-rock-white text-xs font-bold pt-1 mt-1 border-t border-rock-border">
             📝 {order.notes}
           </li>
         )}

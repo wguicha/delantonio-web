@@ -35,6 +35,10 @@ services:
         value: "-4.4213"
       - key: MAX_ORDER_RADIUS_KM
         value: "500"
+      - key: MAX_ORDER_AMOUNT
+        value: "50"
+      - key: GOOGLE_MAPS_REVIEW_URL
+        value: "https://maps.app.goo.gl/F5hZNJEfucFSLEGc7"
       - key: ORDER_RATE_LIMIT_WINDOW_MS
         value: "3600000"
       - key: ORDER_RATE_LIMIT_MAX

@@ -47,6 +47,38 @@ export async function getCategoryBySlug(req: Request, res: Response): Promise<vo
   res.json({ success: true, data: category });
 }
 
+export async function createCategory(req: Request, res: Response): Promise<void> {
+  const schema = z.object({
+    name: z.string().min(1).max(100),
+    description: z.string().optional(),
+  });
+
+  const parsed = schema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ success: false, message: 'Invalid category data', errors: parsed.error.errors });
+    return;
+  }
+
+  const slug = parsed.data.name
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+
+  const maxSortOrder = await prisma.category.aggregate({ _max: { sortOrder: true } });
+  const sortOrder = (maxSortOrder._max.sortOrder ?? 0) + 1;
+
+  try {
+    const category = await prisma.category.create({
+      data: { name: parsed.data.name, description: parsed.data.description, slug, sortOrder },
+      include: { items: true },
+    });
+    res.status(201).json({ success: true, data: category });
+  } catch {
+    res.status(409).json({ success: false, message: 'Ya existe una categoría con ese nombre.' });
+  }
+}
+
 const menuItemSchema = z.object({
   categoryId: z.string(),
   name: z.string().min(1).max(100),

@@ -34,4 +34,21 @@ export const menuService = {
     const response = await apiClient.put<ApiResponse<MenuItem>>(`/menu/items/${id}`, { sortOrder });
     return response.data.data;
   },
+
+  createCategory: async (data: { name: string; description?: string }): Promise<Category> => {
+    const response = await apiClient.post<ApiResponse<Category>>('/menu/categories', data);
+    return response.data.data;
+  },
+
+  createItem: async (data: {
+    categoryId: string;
+    name: string;
+    description?: string;
+    price?: number | null;
+    priceHalf?: number | null;
+    priceFull?: number | null;
+  }): Promise<MenuItem> => {
+    const response = await apiClient.post<ApiResponse<MenuItem>>('/menu/items', data);
+    return response.data.data;
+  },
 };

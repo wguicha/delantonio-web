@@ -3,6 +3,7 @@ import {
   getAdminCategories,
   getCategories,
   getCategoryBySlug,
+  createCategory,
   createMenuItem,
   updateMenuItem,
   toggleMenuItem,
@@ -22,6 +23,7 @@ router.get('/admin/categories', ...adminAuth, getAdminCategories);
 
 // Protected routes (admin only)
 // In dev, allow without auth for testing
+router.post('/categories', ...adminAuth, createCategory);
 router.post('/items', ...adminAuth, createMenuItem);
 router.put('/items/:id', ...adminAuth, updateMenuItem);
 router.patch('/items/:id/toggle', ...adminAuth, toggleMenuItem);

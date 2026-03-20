@@ -8,6 +8,8 @@ import { useMenu } from '../hooks/useMenu';
 import { MenuSection } from '../components/menu/MenuSection';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { orderService } from '../services/orderService';
+import { scheduleService } from '../services/scheduleService';
+import type { Schedule } from '../services/scheduleService';
 import type { GeoCoords } from '../services/orderService';
 import type { Order } from '../types';
 
@@ -18,10 +20,67 @@ function isValidPhone(phone: string): boolean {
   return /^\d{7,15}$/.test(cleaned);
 }
 
-function getMinPickupTime(): string {
-  const d = new Date(Date.now() + 31 * 60 * 1000);
-  d.setSeconds(0, 0);
-  return d.toISOString().slice(0, 16);
+function getPizzeriaStatus(schedule: Schedule): { open: boolean; message: string | null } {
+  const now = new Date();
+  const day = now.getDay();
+  const totalMinutes = now.getHours() * 60 + now.getMinutes();
+  const daySchedule = schedule.days.find((d) => d.day === day);
+
+  if (!daySchedule || !daySchedule.isOpen) {
+    return { open: false, message: 'Hoy estamos cerrados. Puedes hacer tu pedido para otro día.' };
+  }
+
+  const [openH, openM] = daySchedule.openTime.split(':').map(Number);
+  const [closeH, closeM] = daySchedule.closeTime.split(':').map(Number);
+  const openMinutes = openH * 60 + openM;
+  const closeMinutes = closeH * 60 + closeM;
+  const lastOrderMinutes = closeMinutes - schedule.lastOrderMinutesBefore;
+
+  if (totalMinutes < openMinutes) {
+    return { open: false, message: `Aún no hemos abierto. Abrimos a las ${daySchedule.openTime}. Puedes reservar tu pedido con antelación.` };
+  }
+  if (totalMinutes >= closeMinutes) {
+    return { open: false, message: 'Ya hemos cerrado por hoy. Puedes hacer tu pedido para mañana.' };
+  }
+  if (totalMinutes >= lastOrderMinutes) {
+    return { open: true, message: `⚠️ Estamos a punto de cerrar. Último pedido a las ${Math.floor(lastOrderMinutes / 60).toString().padStart(2, '0')}:${(lastOrderMinutes % 60).toString().padStart(2, '0')}.` };
+  }
+  return { open: true, message: null };
+}
+
+function getPickupSlots(schedule: Schedule): { label: string; value: string }[] {
+  const slots: { label: string; value: string }[] = [];
+  const now = new Date();
+  const minTime = new Date(now.getTime() + 31 * 60 * 1000);
+  const DAY_NAMES = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+
+  for (let dayOffset = 0; dayOffset <= 2; dayOffset++) {
+    const date = new Date(now);
+    date.setDate(date.getDate() + dayOffset);
+    const daySchedule = schedule.days.find((d) => d.day === date.getDay());
+    if (!daySchedule || !daySchedule.isOpen) continue;
+
+    const [openH, openM] = daySchedule.openTime.split(':').map(Number);
+    const [closeH, closeM] = daySchedule.closeTime.split(':').map(Number);
+    const lastOrderMinutes = closeH * 60 + closeM - schedule.lastOrderMinutesBefore;
+
+    for (let hour = openH; hour <= closeH; hour++) {
+      for (const minute of [0, 15, 30, 45]) {
+        const slotMinutes = hour * 60 + minute;
+        if (slotMinutes < openH * 60 + openM) continue;
+        if (slotMinutes > lastOrderMinutes) continue;
+
+        const slot = new Date(date);
+        slot.setHours(hour, minute, 0, 0);
+        if (slot <= minTime) continue;
+
+        const dayLabel = dayOffset === 0 ? 'Hoy' : DAY_NAMES[date.getDay()];
+        const timeLabel = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+        slots.push({ label: `${dayLabel} ${timeLabel}`, value: `${slot.getFullYear()}-${String(slot.getMonth() + 1).padStart(2, '0')}-${String(slot.getDate()).padStart(2, '0')}T${timeLabel}` });
+      }
+    }
+  }
+  return slots;
 }
 
 function formatPrice(price: number): string {
@@ -33,8 +92,9 @@ function formatPrice(price: number): string {
 const orderSchema = z.object({
   phone: z
     .string()
-    .min(7, 'Teléfono inválido')
-    .refine(isValidPhone, 'Teléfono inválido (ej: +34612345678 o +351912345678)'),
+    .min(6, 'Teléfono inválido')
+    .max(12, 'Teléfono inválido')
+    .refine((v) => /^\d[\d\s\-\.]{5,11}$/.test(v), 'Solo números (ej: 612 345 678)'),
   name: z.string().min(2, 'Mínimo 2 caracteres').max(100, 'Máximo 100 caracteres'),
   pickupTime: z
     .string()
@@ -54,6 +114,21 @@ const orderSchema = z.object({
 
 type OrderFormValues = z.infer<typeof orderSchema>;
 
+// ── Country codes ───────────────────────────────────────────────────────────
+
+const COUNTRY_CODES = [
+  { code: '34', label: 'ES +34' },
+  { code: '351', label: 'PT +351' },
+  { code: '33', label: 'FR +33' },
+  { code: '49', label: 'DE +49' },
+  { code: '44', label: 'GB +44' },
+  { code: '39', label: 'IT +39' },
+  { code: '31', label: 'NL +31' },
+  { code: '32', label: 'BE +32' },
+  { code: '41', label: 'CH +41' },
+  { code: '1', label: 'US +1' },
+];
+
 // ── OrderPage ──────────────────────────────────────────────────────────────
 
 export function OrderPage() {
@@ -64,6 +139,12 @@ export function OrderPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [completedOrder, setCompletedOrder] = useState<Order | null>(null);
+  const [countryCode, setCountryCode] = useState('34');
+  const [schedule, setSchedule] = useState<Schedule | null>(null);
+
+  useEffect(() => {
+    scheduleService.getSchedule().then(setSchedule);
+  }, []);
 
   // Geolocation
   const [geoCoords, setGeoCoords] = useState<GeoCoords | null>(null);
@@ -84,7 +165,7 @@ export function OrderPage() {
     formState: { errors },
   } = useForm<OrderFormValues>({
     resolver: zodResolver(orderSchema),
-    defaultValues: { pickupTime: getMinPickupTime() },
+    defaultValues: { pickupTime: '' },
   });
 
   const phoneValue = watch('phone');
@@ -128,7 +209,7 @@ export function OrderPage() {
       const order = await orderService.createOrder(
         {
           name: data.name,
-          phone: data.phone,
+          phone: `${countryCode}${data.phone.replace(/[\s\-\.\(\)]/g, '')}`,
           pickupTime: new Date(data.pickupTime).toISOString(),
           notes: data.notes,
           acceptTerms: data.acceptTerms,
@@ -232,9 +313,15 @@ export function OrderPage() {
   // ── Main layout ──────────────────────────────────────────────────────────
   const totalItems = getTotalItems();
   const totalPrice = getTotalPrice();
+  const pizzeriaStatus = schedule ? getPizzeriaStatus(schedule) : null;
 
   return (
     <main className="min-h-screen pt-20">
+      {pizzeriaStatus?.message && (
+        <div className={`px-4 py-3 text-sm text-center font-medium ${pizzeriaStatus.open ? 'bg-yellow-900/50 text-yellow-300 border-b border-yellow-700' : 'bg-rock-card text-rock-metal-light border-b border-rock-border'}`}>
+          {pizzeriaStatus.open ? '' : '🔴 '}{pizzeriaStatus.message}
+        </div>
+      )}
       <div className="max-w-7xl mx-auto px-4 py-8 lg:flex lg:gap-8 lg:items-start">
 
         {/* ── LEFT: Menu ─────────────────────────────────────────────── */}
@@ -253,7 +340,7 @@ export function OrderPage() {
         </div>
 
         {/* ── RIGHT: Cart + Form ──────────────────────────────────────── */}
-        <div ref={formRef} className="lg:w-96 w-full lg:sticky lg:top-24 flex flex-col gap-4">
+        <div ref={formRef} className="lg:w-96 w-full lg:sticky lg:top-24 flex flex-col gap-4 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto">
 
           {/* Cart panel */}
           <div className="bg-rock-card border border-rock-border">
@@ -390,20 +477,32 @@ export function OrderPage() {
                 >
                   Teléfono *
                 </label>
-                <div className="relative">
-                  <input
-                    id="phone"
-                    type="tel"
-                    autoComplete="tel"
-                    placeholder="612 345 678"
-                    className="w-full bg-rock-dark border border-rock-border text-rock-white px-3 py-2.5 text-sm focus:outline-none focus:border-rock-red transition-colors"
-                    {...register('phone')}
-                  />
-                  {lookingUpPhone && (
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                      <LoadingSpinner size="sm" />
-                    </div>
-                  )}
+                <div className="flex">
+                  <select
+                    value={countryCode}
+                    onChange={(e) => setCountryCode(e.target.value)}
+                    className="bg-rock-dark border border-rock-border border-r-0 text-rock-white px-2 py-2.5 text-sm focus:outline-none focus:border-rock-red transition-colors"
+                    aria-label="Código de país"
+                  >
+                    {COUNTRY_CODES.map((c) => (
+                      <option key={c.code} value={c.code}>{c.label}</option>
+                    ))}
+                  </select>
+                  <div className="relative flex-1">
+                    <input
+                      id="phone"
+                      type="tel"
+                      autoComplete="tel-national"
+                      placeholder="612 345 678"
+                      className="w-full bg-rock-dark border border-rock-border text-rock-white px-3 py-2.5 text-sm focus:outline-none focus:border-rock-red transition-colors"
+                      {...register('phone')}
+                    />
+                    {lookingUpPhone && (
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                        <LoadingSpinner size="sm" />
+                      </div>
+                    )}
+                  </div>
                 </div>
                 {errors.phone && (
                   <p className="text-rock-red text-xs mt-1" role="alert">{errors.phone.message}</p>
@@ -439,15 +538,18 @@ export function OrderPage() {
                 >
                   Hora de recogida *
                 </label>
-                <input
+                <select
                   id="pickupTime"
-                  type="datetime-local"
-                  min={getMinPickupTime()}
-                  className="w-full bg-rock-dark border border-rock-border text-rock-white px-3 py-2.5 text-sm focus:outline-none focus:border-rock-red transition-colors [color-scheme:dark]"
+                  className="w-full bg-rock-dark border border-rock-border text-rock-white px-3 py-2.5 text-sm focus:outline-none focus:border-rock-red transition-colors"
                   {...register('pickupTime')}
-                />
+                >
+                  <option value="">Selecciona hora...</option>
+                  {(schedule ? getPickupSlots(schedule) : []).map((slot) => (
+                    <option key={slot.value} value={slot.value}>{slot.label}</option>
+                  ))}
+                </select>
                 <p className="text-rock-metal text-xs mt-1">
-                  Mínimo 30 min · Martes–Domingo 13:00–23:00
+                  Mínimo 30 min · Mar–Dom 13:00–22:30 (último pedido)
                 </p>
                 {errors.pickupTime && (
                   <p className="text-rock-red text-xs mt-1" role="alert">{errors.pickupTime.message}</p>

@@ -11,6 +11,7 @@ import authRoutes from './routes/auth';
 import menuRoutes from './routes/menu';
 import orderRoutes from './routes/orders';
 import customerRoutes from './routes/customers';
+import scheduleRoutes from './routes/schedule';
 
 const app = express();
 
@@ -40,6 +41,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/menu', menuRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/customers', customerRoutes);
+app.use('/api/schedule', scheduleRoutes);
 
 // Error handling
 app.use(notFoundHandler);
