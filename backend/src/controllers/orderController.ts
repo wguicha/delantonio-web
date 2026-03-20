@@ -4,7 +4,6 @@ import { z } from 'zod';
 import { prisma } from '../config/database';
 import { whatsappService } from '../services/whatsappService';
 import { normalizePhone, isValidPhone } from '../services/phoneValidationService';
-import { getScheduleData } from './scheduleController';
 import { OrderStatus } from '@prisma/client';
 
 // Shared emitter for real-time SSE — one event per order change
@@ -67,40 +66,6 @@ export async function createOrder(req: Request, res: Response): Promise<void> {
     res.status(400).json({
       success: false,
       message: `El pedido debe realizarse con al menos ${MINIMUM_ADVANCE_MINUTES} minutos de antelación.`,
-    });
-    return;
-  }
-
-  // Validate pickup time within opening hours (from DB schedule)
-  // Parse date/time directly from the string (frontend sends YYYY-MM-DDTHH:MM in local time)
-  const schedule = await getScheduleData();
-  const dateMatch = pickupTime.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
-  if (!dateMatch) {
-    res.status(400).json({ success: false, message: 'Formato de hora inválido.' });
-    return;
-  }
-  const [, year, month, day, hourStr, minuteStr] = dateMatch;
-  const pickupDay = new Date(parseInt(year), parseInt(month) - 1, parseInt(day)).getDay();
-  const pickupHour = parseInt(hourStr);
-  const pickupMinute = parseInt(minuteStr);
-  const pickupTotalMinutes = pickupHour * 60 + pickupMinute;
-  const daySchedule = schedule.days.find((d) => d.day === pickupDay);
-
-  if (!daySchedule || !daySchedule.isOpen) {
-    res.status(400).json({ success: false, message: 'Lo sentimos, ese día estamos cerrados.' });
-    return;
-  }
-
-  const [openH, openM] = daySchedule.openTime.split(':').map(Number);
-  const [closeH, closeM] = daySchedule.closeTime.split(':').map(Number);
-  const openMinutes = openH * 60 + openM;
-  const closeMinutes = closeH * 60 + closeM;
-  const lastOrderMinutes = closeMinutes - schedule.lastOrderMinutesBefore;
-
-  if (pickupTotalMinutes < openMinutes || pickupTotalMinutes > lastOrderMinutes) {
-    res.status(400).json({
-      success: false,
-      message: `La hora de recogida debe estar entre las ${daySchedule.openTime} y las ${Math.floor(lastOrderMinutes / 60).toString().padStart(2, '0')}:${(lastOrderMinutes % 60).toString().padStart(2, '0')} (último pedido).`,
     });
     return;
   }
