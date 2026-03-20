@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 
 export function PrivacyPage() {
   return (
-    <main className="pt-20 pb-16 px-4">
+    <main className="pt-28 pb-16 px-4">
       <div className="max-w-3xl mx-auto">
         <div className="mb-8">
           <Link to="/" className="text-rock-red hover:text-rock-red-bright text-sm transition-colors">

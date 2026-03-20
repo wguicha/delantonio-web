@@ -228,7 +228,7 @@ export function OrderPage() {
   // ── Success screen ───────────────────────────────────────────────────────
   if (completedOrder) {
     return (
-      <main className="min-h-screen flex items-center justify-center pt-20 px-4">
+      <main className="min-h-screen flex items-center justify-center pt-28 px-4">
         <div className="max-w-md w-full text-center">
           <div className="text-6xl mb-6" aria-hidden="true">🤘</div>
           <h1
@@ -312,7 +312,7 @@ export function OrderPage() {
   const pizzeriaStatus = schedule ? getPizzeriaStatus(schedule) : null;
 
   return (
-    <main className="min-h-screen pt-20">
+    <main className="min-h-screen pt-28">
       {pizzeriaStatus?.message && (
         <div className={`px-4 py-3 text-sm text-center font-medium ${pizzeriaStatus.open ? 'bg-yellow-900/50 text-yellow-300 border-b border-yellow-700' : 'bg-rock-card text-rock-metal-light border-b border-rock-border'}`}>
           {pizzeriaStatus.open ? '' : '🔴 '}{pizzeriaStatus.message}

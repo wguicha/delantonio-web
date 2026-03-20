@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useMenu } from '../hooks/useMenu';
 import { MenuSection } from '../components/menu/MenuSection';
+import { GallerySection } from '../components/gallery/GallerySection';
 
 export function HomePage() {
   const { categories, loading } = useMenu();
@@ -31,7 +32,7 @@ export function HomePage() {
           aria-hidden="true"
         />
 
-        <div className="relative z-10 text-center px-4 max-w-5xl mx-auto pt-20 pb-16">
+        <div className="relative z-10 text-center px-4 max-w-5xl mx-auto pt-28 pb-16">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 border border-rock-red/40 bg-rock-red/10 px-5 py-1.5 mb-10 text-rock-red/90 text-xs uppercase tracking-[0.3em]">
             <span aria-hidden="true">🎸</span> Pizzería Rock
@@ -314,8 +315,16 @@ export function HomePage() {
                 <p className="text-rock-white" style={{ fontFamily: "'Roboto Condensed', sans-serif" }}>
                   Pizzería Del Antonio
                 </p>
-                <p className="text-rock-metal-light text-sm">Pl. Autonomía, 25</p>
-                <p className="text-rock-metal-light text-sm">23730 Villanueva de la Reina, Jaén</p>
+                <a
+                  href="https://maps.google.com/?q=Pl.+Autonomía,+25,+23730+Villanueva+de+la+Reina,+Jaén"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block text-rock-metal-light text-sm hover:text-rock-gold transition-colors"
+                >
+                  <p>Pl. Autonomía, 25</p>
+                  <p>23730 Villanueva de la Reina, Jaén</p>
+                  <p className="text-xs mt-1 text-rock-red">📍 Ver en Google Maps</p>
+                </a>
               </address>
               <div className="mt-6 border-t border-rock-border pt-4 space-y-2">
                 <p className="text-rock-metal-light text-sm">
@@ -332,6 +341,9 @@ export function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ── GALERÍA ──────────────────────────────────────── */}
+      <GallerySection />
 
       {/* ── NOSOTROS ─────────────────────────────────────── */}
       <section id="nosotros" className="py-20 px-4" aria-label="Sobre nosotros">

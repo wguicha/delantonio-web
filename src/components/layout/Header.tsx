@@ -9,12 +9,19 @@ export function Header() {
 
   const navLinks = [
     { href: '/#menu', label: 'Menú' },
+    { href: '/#galeria', label: 'Galería' },
     { href: '/#horarios', label: 'Horarios' },
     { href: '/#nosotros', label: 'Nosotros' },
   ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-rock-black/95 backdrop-blur-sm border-b border-rock-border">
+    <header className="fixed top-0 left-0 right-0 z-50">
+      <div className="bg-yellow-400 text-center py-1">
+        <span className="text-red-600 font-bold uppercase tracking-widest text-sm" style={{ fontFamily: "'Bebas Neue', Impact, sans-serif", letterSpacing: '0.2em' }}>
+          ⚠️ Página de Prueba ⚠️
+        </span>
+      </div>
+      <div className="bg-rock-black/95 backdrop-blur-sm border-b border-rock-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -91,6 +98,7 @@ export function Header() {
             ))}
           </nav>
         )}
+      </div>
       </div>
     </header>
   );
