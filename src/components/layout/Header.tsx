@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Logo } from './Logo';
 import { useCartStore } from '../../store/cartStore';
+import { SelectionModal } from '../ui/SelectionModal';
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [selectionOpen, setSelectionOpen] = useState(false);
   const totalItems = useCartStore((s) => s.getTotalItems());
 
   const navLinks = [
@@ -45,25 +47,26 @@ export function Header() {
 
           {/* Actions */}
           <div className="flex items-center gap-3">
-            {/* Cart button */}
+            {/* Selection button */}
             <div className="relative">
-              <Link
-                to="/pedir"
+              <button
+                onClick={() => setSelectionOpen(true)}
                 className="flex items-center gap-2 bg-rock-red hover:bg-rock-red-bright text-white px-4 py-2 font-rock tracking-wider text-sm transition-colors"
                 style={{ fontFamily: "'Bebas Neue', Impact, sans-serif", letterSpacing: '0.1em', clipPath: 'polygon(4px 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%)' }}
-                aria-label={`Pedir - ${totalItems} artículos en el carrito`}
+                aria-label={`Ver selección - ${totalItems} artículos`}
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                 </svg>
-                PEDIR
-              </Link>
+                VER SELECCIÓN
+              </button>
               {totalItems > 0 && (
                 <span className="absolute -top-2 -right-2 bg-rock-gold text-rock-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center pointer-events-none" aria-live="polite">
                   {totalItems}
                 </span>
               )}
             </div>
+            {selectionOpen && <SelectionModal onClose={() => setSelectionOpen(false)} />}
 
             {/* Mobile menu toggle */}
             <button

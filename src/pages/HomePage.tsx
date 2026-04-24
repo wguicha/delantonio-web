@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import { useMenu } from '../hooks/useMenu';
 import { MenuSection } from '../components/menu/MenuSection';
 import { GallerySection } from '../components/gallery/GallerySection';
@@ -101,19 +100,6 @@ export function HomePage() {
 
           {/* CTA buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              to="/pedir"
-              className="inline-flex items-center justify-center gap-2 bg-rock-red hover:bg-rock-red-bright text-white transition-all hover:scale-[1.03] hover:shadow-[0_0_30px_rgba(220,38,38,0.5)]"
-              style={{
-                fontFamily: "'Bebas Neue', Impact, sans-serif",
-                fontSize: '1.4rem',
-                letterSpacing: '0.1em',
-                padding: '1rem 2.5rem',
-                clipPath: 'polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%)',
-              }}
-            >
-              🍕 PEDIR AHORA
-            </Link>
             <a
               href="#menu"
               className="inline-flex items-center justify-center gap-2 border-2 border-rock-gold text-rock-gold hover:bg-rock-gold hover:text-rock-black transition-all"
@@ -194,22 +180,6 @@ export function HomePage() {
 
           <MenuSection categories={categories} loading={loading} />
 
-          {/* CTA below menu */}
-          <div className="text-center mt-12">
-            <Link
-              to="/pedir"
-              className="inline-flex items-center justify-center gap-2 bg-rock-red hover:bg-rock-red-bright text-white transition-all hover:scale-[1.03]"
-              style={{
-                fontFamily: "'Bebas Neue', Impact, sans-serif",
-                fontSize: '1.3rem',
-                letterSpacing: '0.1em',
-                padding: '0.9rem 2.5rem',
-                clipPath: 'polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%)',
-              }}
-            >
-              🛒 VER CARRITO Y PEDIR
-            </Link>
-          </div>
         </div>
       </section>
 
@@ -371,19 +341,6 @@ export function HomePage() {
             <br /><br />
             Masa artesanal, ingredientes frescos y el volumen siempre al máximo.
           </p>
-          <Link
-            to="/pedir"
-            className="inline-flex items-center justify-center gap-2 bg-rock-red hover:bg-rock-red-bright text-white transition-all hover:scale-[1.03]"
-            style={{
-              fontFamily: "'Bebas Neue', Impact, sans-serif",
-              fontSize: '1.3rem',
-              letterSpacing: '0.1em',
-              padding: '0.9rem 2.5rem',
-              clipPath: 'polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%)',
-            }}
-          >
-            🍕 HAZ TU PEDIDO
-          </Link>
         </div>
       </section>
     </main>
